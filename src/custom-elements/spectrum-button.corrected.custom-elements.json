@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "2.1.0",
+  "readme": "Consumer-maintained replacement for @spectrum-web-components/button metadata used by this application. Named unions that lack CEM references in the vendor manifest are expanded from the package's public declarations.",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/Button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "Button",
+          "customElement": true,
+          "tagName": "sp-button",
+          "description": "Spectrum button with consumer-corrected property and attribute types.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "attribute": "disabled",
+              "description": "Whether the inherited focusable control is disabled."
+            },
+            {
+              "kind": "field",
+              "name": "pending",
+              "type": { "text": "boolean" },
+              "attribute": "pending",
+              "description": "Whether the button displays its pending state."
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "type": {
+                "text": "'accent' | 'primary' | 'secondary' | 'negative' | 'white' | 'black' | 'cta' | 'overBackground'"
+              },
+              "attribute": "variant",
+              "description": "The visual variant applied to the button."
+            },
+            {
+              "kind": "field",
+              "name": "staticColor",
+              "type": { "text": "'black' | 'white' | undefined" },
+              "attribute": "static-color",
+              "description": "The static color variant used by the button."
+            },
+            {
+              "kind": "field",
+              "name": "treatment",
+              "type": { "text": "'fill' | 'outline'" },
+              "attribute": "treatment",
+              "default": "'fill'",
+              "deprecated": "The treatment property is deprecated by Spectrum Web Components.",
+              "description": "The visual treatment applied to the button."
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "'button' | 'submit' | 'reset'" },
+              "attribute": "type",
+              "default": "'button'",
+              "description": "The button's form behavior."
+            }
+          ],
+          "attributes": [
+            { "name": "disabled", "type": { "text": "boolean" }, "fieldName": "disabled" },
+            { "name": "pending", "type": { "text": "boolean" }, "fieldName": "pending" },
+            {
+              "name": "variant",
+              "type": {
+                "text": "'accent' | 'primary' | 'secondary' | 'negative' | 'white' | 'black' | 'cta' | 'overBackground'"
+              },
+              "fieldName": "variant"
+            },
+            {
+              "name": "static-color",
+              "type": { "text": "'black' | 'white' | undefined" },
+              "fieldName": "staticColor"
+            },
+            {
+              "name": "treatment",
+              "type": { "text": "'fill' | 'outline'" },
+              "fieldName": "treatment",
+              "default": "'fill'",
+              "deprecated": "The treatment attribute is deprecated by Spectrum Web Components."
+            },
+            {
+              "name": "type",
+              "type": { "text": "'button' | 'submit' | 'reset'" },
+              "fieldName": "type",
+              "default": "'button'"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "sp-button",
+          "declaration": { "name": "Button" }
+        }
+      ]
+    }
+  ]
+}

@@ -1,1 +1,35 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@box-model/web/styles/box-model-light';
+
+@import '@shoelace-style/shoelace/dist/themes/light.css';
+@import '@nordhealth/css';
+/*
+ * Clarity tokens only (custom properties on `:where(:root, :host)`, zero specificity).
+ * Deliberately not `@cds/core/global.css`, whose reset/typography rules would restyle the
+ * whole gallery.
+ */
+@import '@cds/core/styles/module.tokens.css';
+
+/*
+ * Nord's global stylesheet ships an unscoped FOUC guard, `:not(:defined) { visibility: hidden }`,
+ * which also matches Angular component host elements (hyphenated tags that are never registered
+ * with `customElements.define`) — hiding the entire application starting at `<app-root>`.
+ * Neutralize it, then re-apply the guard scoped to the Nord elements this app uses.
+ */
+:not(:defined) {
+  visibility: inherit;
+}
+
+nord-button:not(:defined) {
+  visibility: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--sl-color-neutral-900);
+  background: var(--sl-color-neutral-50);
+  font-family: var(--sl-font-sans);
+}

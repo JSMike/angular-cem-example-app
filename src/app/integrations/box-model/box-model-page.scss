@@ -1,0 +1,158 @@
+@use '@box-model/web/styles/surface' as box-model-surface;
+
+:host {
+  display: block;
+}
+
+.page {
+  @include box-model-surface.offset-theme(light);
+
+  width: min(70rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0;
+  color: var(--box-model-text-primary);
+}
+
+.hero {
+  max-width: 52rem;
+  margin-bottom: 2rem;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 48rem;
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+}
+
+.eyebrow,
+.kicker {
+  color: var(--box-model-brand-primary-strong);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lede,
+.section-heading > p,
+.reference-card > p,
+.intent-layout p {
+  color: var(--box-model-text-secondary);
+  line-height: 1.65;
+}
+
+.lede {
+  font-size: 1.125rem;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+alert-box {
+  margin-bottom: 2rem;
+}
+
+section {
+  @include box-model-surface.frame(default, light);
+
+  margin-top: 2rem;
+}
+
+.section-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(16rem, 0.8fr);
+  gap: 2rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+.section-heading > p {
+  margin-bottom: 0;
+}
+
+.kicker {
+  margin-bottom: 0.4rem;
+}
+
+.reference-card {
+  --card-background: var(--box-model-background-surface);
+  --card-border-color: var(--box-model-border-strong);
+  --card-shadow: var(--box-model-shadow-offset-xs);
+}
+
+code {
+  padding: 0.1em 0.3em;
+  background: var(--box-model-background-sunken);
+}
+
+pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--box-model-border-strong);
+  background: var(--box-model-background-sunken);
+  box-shadow: var(--box-model-shadow-offset-xs);
+  line-height: 1.5;
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+.intent-layout {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+  gap: 2rem;
+}
+
+.intent-layout h3 {
+  margin-bottom: 0.5rem;
+}
+
+.progress-demo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+terminal-box {
+  display: block;
+  height: auto;
+}
+
+.progress-label {
+  margin-bottom: 0;
+  color: var(--box-model-text-secondary);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 46rem) {
+  .page {
+    padding-top: 2rem;
+  }
+
+  .section-heading,
+  .progress-demo,
+  .intent-layout {
+    grid-template-columns: 1fr;
+  }
+}

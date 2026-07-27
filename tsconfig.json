@@ -16,6 +16,25 @@
     "module": "preserve"
   },
   "angularCompilerOptions": {
+    "customElementsManifests": [
+      "@shoelace-style/shoelace",
+      "@box-model/web",
+      "@cds/core",
+      "@spectrum-web-components/theme",
+      "./src/custom-elements/spectrum-button.corrected.custom-elements.json",
+      "@spectrum-web-components/textfield",
+      "@ui5/webcomponents",
+      "@esri/calcite-components",
+      "@fluentui/web-components",
+      "@nordhealth/components",
+      "@rhds/elements",
+      "@aurodesignsystem/auro-button",
+      "@vaadin/button",
+      "@local/cem-workspace-example",
+      "./node_modules/@patternfly/elements/custom-elements.json",
+      "./src/custom-elements/lion-button.custom-elements.json",
+      "./src/custom-elements/material-web-button.custom-elements.json"
+    ],
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,

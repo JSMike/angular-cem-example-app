@@ -1,0 +1,180 @@
+:host {
+  display: block;
+  color: #1d2733;
+}
+
+.page {
+  width: min(76rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+.hero {
+  max-width: 62rem;
+  margin-bottom: 2rem;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  max-width: 58rem;
+  font-size: clamp(2.25rem, 6vw, 4.75rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: 1.5rem;
+}
+
+.eyebrow,
+.package {
+  color: #185d64;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lede,
+article > p,
+.toolbar p {
+  color: #4a5664;
+  line-height: 1.6;
+}
+
+.lede {
+  font-size: 1.125rem;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.toolbar button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 2px solid #185d64;
+  border-radius: 0.35rem;
+  color: white;
+  background: #185d64;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toolbar button:hover {
+  background: #0e454b;
+}
+
+.toolbar button:focus-visible {
+  outline: 3px solid #f0b429;
+  outline-offset: 3px;
+}
+
+.toolbar p {
+  margin-bottom: 0;
+}
+
+.system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+article {
+  min-width: 0;
+  padding: 1.5rem;
+  border: 1px solid #ccd5df;
+  border-radius: 0.65rem;
+  background: white;
+  box-shadow: 0.3rem 0.3rem 0 #dcebee;
+}
+
+.card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.package {
+  margin-bottom: 0.25rem;
+}
+
+.status {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.5rem;
+  border-radius: 999px;
+  color: #17202a;
+  background: #e7ebef;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.status--clean {
+  color: #0d4b31;
+  background: #ccebdc;
+}
+
+.status--partial {
+  color: #694100;
+  background: #ffecb5;
+}
+
+.status--warning {
+  color: #7a271a;
+  background: #fee4df;
+}
+
+.status--workaround {
+  color: #234a73;
+  background: #dbeafe;
+}
+
+code {
+  padding: 0.1em 0.3em;
+  border-radius: 0.2rem;
+  background: #edf1f4;
+}
+
+.component-stack {
+  display: grid;
+  gap: 0.75rem;
+}
+
+sp-theme,
+sp-textfield {
+  display: block;
+}
+
+@media (max-width: 48rem) {
+  .page {
+    padding-top: 2rem;
+  }
+
+  .system-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card-heading {
+    display: block;
+  }
+
+  .status {
+    display: inline-block;
+    margin-top: 0.75rem;
+  }
+}

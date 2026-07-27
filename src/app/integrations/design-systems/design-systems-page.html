@@ -1,0 +1,354 @@
+<div class="page">
+  <header class="hero">
+    <p class="eyebrow">Published CEM compatibility matrix</p>
+    <h1>Twelve design systems, one Angular template checker</h1>
+    <p class="lede">
+      Every example below is a real custom element loaded from its library. Angular checks these
+      tags and bindings through standards-based Custom Elements Manifests, without
+      <code>CUSTOM_ELEMENTS_SCHEMA</code>.
+    </p>
+
+    <div class="toolbar" aria-label="Integration controls">
+      <button type="button" [attr.aria-pressed]="controlsDisabled()" (click)="toggleDisabled()">
+        Toggle component state: {{ controlsDisabled() ? 'on' : 'off' }}
+      </button>
+      <p aria-live="polite">{{ activitySummary() }}</p>
+    </div>
+  </header>
+
+  <section class="system-grid" aria-label="Design system component integrations">
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;spectrum-web-components</p>
+          <h2>Spectrum</h2>
+        </div>
+        <span class="status status--workaround">Local type repair</span>
+      </div>
+      <p>
+        This app replaces the button package's unusable named-union metadata with a focused local
+        manifest. <code>variant</code> regains strict values and completions, and the projection
+        adds the inherited <code>disabled</code> member from the package's public declarations.
+        Theme and textfield continue to use their vendor manifests.
+      </p>
+      <sp-theme system="spectrum" color="light" scale="medium">
+        <div class="component-stack">
+          <sp-textfield
+            label="Manifest test value"
+            [maxlength]="40"
+            [value]="spectrumValue()"
+            (input)="updateSpectrumValue($event)"
+          ></sp-textfield>
+          <sp-button
+            type="button"
+            static-color="black"
+            [variant]="spectrumVariant()"
+            [pending]="false"
+            [disabled]="controlsDisabled()"
+            (click)="recordActivation('Spectrum')"
+          >
+            Spectrum action
+          </sp-button>
+        </div>
+      </sp-theme>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;ui5/webcomponents</p>
+          <h2>UI5</h2>
+        </div>
+        <span class="status status--partial">Partial types</span>
+      </div>
+      <p>
+        Static enum values and default-exported property types are checked. The manifest's
+        <code>click</code> payload type is not applied because its reference omits the
+        <code>start</code>/<code>end</code> indices the spec requires for nested names, so
+        <code>$event</code> stays native until UI5 emits exact offsets.
+      </p>
+      <div class="component-stack">
+        <ui5-button
+          design="Emphasized"
+          [disabled]="controlsDisabled()"
+          (click)="recordUi5Activation($event)"
+        >
+          Static enum value
+        </ui5-button>
+        <ui5-button
+          [design]="ui5ButtonDesign"
+          [disabled]="controlsDisabled()"
+          (click)="recordUi5Activation($event)"
+        >
+          Default-exported enum binding
+        </ui5-button>
+      </div>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;esri/calcite-components</p>
+          <h2>Calcite</h2>
+        </div>
+        <span class="status status--partial">Partial types</span>
+      </div>
+      <p>
+        Element classes and inline unions resolve, while references to non-exported internal type
+        modules are safely stripped.
+      </p>
+      <calcite-button
+        appearance="outline-fill"
+        kind="brand"
+        scale="m"
+        [loading]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Calcite')"
+      >
+        Calcite action
+      </calcite-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;cds/core</p>
+          <h2>Clarity</h2>
+        </div>
+        <span class="status status--warning">Manifest warnings</span>
+      </div>
+      <p>
+        Inline literal unions such as <code>action</code> and <code>status</code> are fully checked.
+        The export map hides the <code>*.element.js</code> modules the manifest references, and the
+        unquoted <code>loadingState</code> union degrades to a safe fallback.
+      </p>
+      <cds-button
+        action="outline"
+        status="primary"
+        size="md"
+        type="button"
+        [block]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Clarity')"
+      >
+        Clarity action
+      </cds-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;fluentui/web-components</p>
+          <h2>Fluent UI</h2>
+        </div>
+        <span class="status status--warning">Manifest warnings</span>
+      </div>
+      <p>
+        Primitive members remain usable, but private module paths prevent element instance and
+        named-alias validation.
+      </p>
+      <fluent-button
+        appearance="primary"
+        shape="rounded"
+        size="medium"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Fluent UI')"
+      >
+        Fluent action
+      </fluent-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;nordhealth/components</p>
+          <h2>Nord</h2>
+        </div>
+        <span class="status status--warning">Manifest warnings</span>
+      </div>
+      <p>
+        Inline literal unions such as <code>variant</code> are fully checked. The manifest's module
+        paths name unshipped <code>src/*.ts</code> sources, so element instance types and
+        <code>NordEvent</code> payloads degrade to their platform fallbacks.
+      </p>
+      <nord-button
+        variant="primary"
+        type="button"
+        [loading]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Nord')"
+      >
+        Nord action
+      </nord-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;rhds/elements</p>
+          <h2>Red Hat Design System</h2>
+        </div>
+        <span class="status status--partial">Partial types</span>
+      </div>
+      <p>
+        The gallery's first CEM v2.1 producer. Inline literal unions such as
+        <code>variant</code> are fully checked, and <code>rh-switch</code>'s
+        <code>change</code> event declares a standards-compliant <code>global:</code>
+        <code>Event</code> reference. Barrel re-exports currently make some element instance types
+        ambiguous.
+      </p>
+      <div class="component-stack">
+        <rh-button
+          variant="secondary"
+          type="button"
+          [danger]="false"
+          [disabled]="controlsDisabled()"
+          (click)="recordActivation('RHDS')"
+        >
+          RHDS action
+        </rh-button>
+        <rh-switch
+          accessible-label="RHDS manifest switch"
+          message-on="Switch is on"
+          message-off="Switch is off"
+          show-check-icon
+          [checked]="rhdsChecked()"
+          [disabled]="controlsDisabled()"
+          (change)="recordRhdsSwitch($event)"
+        ></rh-switch>
+      </div>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;aurodesignsystem/auro-button</p>
+          <h2>Auro</h2>
+        </div>
+        <span class="status status--warning">Manifest warnings</span>
+      </div>
+      <p>
+        A compact example of manifests whose module paths name unpublished
+        <code>src/*.js</code> sources: every declared type is a self-contained primitive, so
+        property and attribute bindings stay fully checked while the element instance type degrades
+        to <code>HTMLElement</code>.
+      </p>
+      <auro-button
+        appearance="default"
+        shape="rounded"
+        size="md"
+        [loading]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Auro')"
+      >
+        Auro action
+      </auro-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;vaadin/button</p>
+          <h2>Vaadin</h2>
+        </div>
+        <span class="status status--clean">Clean load</span>
+      </div>
+      <p>
+        The directly declared <code>disabled</code> member and the element instance type resolve
+        cleanly; mixin flattening is intentionally outside Angular's current scope.
+      </p>
+      <vaadin-button [disabled]="controlsDisabled()" (click)="recordActivation('Vaadin')">
+        Vaadin action
+      </vaadin-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;patternfly/elements</p>
+          <h2>PatternFly</h2>
+        </div>
+        <span class="status status--workaround">Direct-file manifest</span>
+      </div>
+      <p>
+        Inline types work well. The package export map does not expose its manifest, so this app
+        loads the published JSON by file path.
+      </p>
+      <pf-v5-button
+        type="button"
+        size="small"
+        [loading]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('PatternFly')"
+      >
+        PatternFly action
+      </pf-v5-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;lion/ui</p>
+          <h2>Lion</h2>
+        </div>
+        <span class="status status--workaround">Focused projection</span>
+      </div>
+      <p>
+        Angular's language-service resource path now supports the published 5.8 MB manifest. This
+        committed gallery configuration keeps a focused <code>lion-button</code> projection to avoid
+        loading unrelated test and dependency declarations on every editor session.
+      </p>
+      <lion-button
+        type="button"
+        [active]="false"
+        [disabled]="controlsDisabled()"
+        [tabIndex]="0"
+        (click)="recordActivation('Lion')"
+      >
+        Lion action
+      </lion-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;material/web</p>
+          <h2>Material Web</h2>
+        </div>
+        <span class="status status--workaround">App-owned manifest</span>
+      </div>
+      <p>
+        Material Web does not publish a Custom Elements Manifest. This app supplies a focused local
+        projection from the package's public declarations, enabling strict button properties and
+        finite value completions without waiting for an upstream release.
+      </p>
+      <md-filled-button
+        target="_self"
+        [type]="materialButtonType()"
+        [softDisabled]="false"
+        [disabled]="controlsDisabled()"
+        (click)="recordActivation('Material Web')"
+      >
+        Material action
+      </md-filled-button>
+    </article>
+
+    <article>
+      <div class="card-heading">
+        <div>
+          <p class="package">&#64;local/cem-workspace-example</p>
+          <h2>Workspace package</h2>
+        </div>
+        <span class="status status--clean">Package identity</span>
+      </div>
+      <p>
+        A consumer-authored manifest published through a local package supplies both strict member
+        checking and the element class identity used for local template references.
+      </p>
+      <cem-workspace-example #workspaceCem [variant]="'primary'">
+        Workspace manifest element
+      </cem-workspace-example>
+      <p>Local reference: {{ workspaceCem.workspaceOnly }}</p>
+    </article>
+  </section>
+</div>

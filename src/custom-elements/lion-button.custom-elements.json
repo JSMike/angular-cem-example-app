@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "2.1.0",
+  "readme": "A focused projection of @lion/ui's published manifest. The full 5.8 MB manifest exceeds TypeScript's language-service large-resource threshold.",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "components/button/src/LionButton.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "LionButton",
+          "customElement": true,
+          "tagName": "lion-button",
+          "members": [
+            {
+              "kind": "field",
+              "name": "active",
+              "type": { "text": "boolean" },
+              "attribute": "active"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "tabIndex",
+              "type": { "text": "number" },
+              "attribute": "tabindex"
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "string" },
+              "attribute": "type"
+            }
+          ],
+          "attributes": [
+            { "name": "active", "type": { "text": "boolean" }, "fieldName": "active" },
+            { "name": "disabled", "type": { "text": "boolean" }, "fieldName": "disabled" },
+            { "name": "tabindex", "type": { "text": "number" }, "fieldName": "tabIndex" },
+            { "name": "type", "type": { "text": "string" }, "fieldName": "type" }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "lion-button",
+          "declaration": { "name": "LionButton" }
+        }
+      ]
+    }
+  ]
+}

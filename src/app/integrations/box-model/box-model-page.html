@@ -1,0 +1,159 @@
+<div class="page box-model-theme-light">
+  <header class="hero">
+    <p class="eyebrow">Angular + package-owned integration metadata</p>
+    <h1>Box Model UI with strict templates and agent guidance</h1>
+    <p class="lede">
+      This page consumes the published <code>@box-model/web</code> package from npm. The
+      <code>0.0.1</code> artifact ships its components, Custom Elements Manifest, Sass utilities,
+      and a version-matched Agent Skill.
+    </p>
+    <div class="tag-list" role="list" aria-label="Integration characteristics">
+      <tag-box role="listitem" variant="info">Published package 0.0.1</tag-box>
+      <tag-box role="listitem" variant="success">References resolved</tag-box>
+      <tag-box role="listitem" variant="success">Intent skill loaded</tag-box>
+      <tag-box role="listitem" variant="neutral">No schema suppression</tag-box>
+    </div>
+  </header>
+
+  @if (alertVisible()) {
+    <alert-box variant="success" (close)="dismissAlert($event)">
+      <p>
+        Angular resolves exact public aliases through <code>type.references</code>. The close
+        handler is now checked as <code>CustomEvent&lt;void&gt;</code> through the manifest's
+        explicit global reference.
+      </p>
+      <close-control-box slot="close-control" label="Dismiss integration status">
+      </close-control-box>
+    </alert-box>
+  }
+
+  <section aria-labelledby="references-heading">
+    <div class="section-heading">
+      <div>
+        <p class="kicker">type.references</p>
+        <h2 id="references-heading">Referenced literal unions</h2>
+      </div>
+      <p>
+        These bound and static values are checked against aliases exported from each component's
+        declaration module.
+      </p>
+    </div>
+
+    <columns-box class="reference-grid" [gap]="columnGap()" [minWidth]="'17rem'">
+      <card-box class="reference-card">
+        <h3 slot="header">Bound ButtonVariant</h3>
+        <p>
+          The <code>variant</code> signal is checked against the referenced
+          <code>ButtonVariant</code> alias.
+        </p>
+        <div slot="actions">
+          <button-box [variant]="buttonVariant()" size="large">
+            <button type="button" (click)="cycleButtonVariant()">
+              Cycle variant: {{ buttonVariant() }}
+            </button>
+          </button-box>
+        </div>
+      </card-box>
+
+      <card-box class="reference-card">
+        <h3 slot="header">Bound ColumnsGap</h3>
+        <p>
+          This page's layout uses the referenced <code>ColumnsGap</code> type and the exact
+          camel-case <code>minWidth</code> property mapping behind <code>min-width</code>.
+        </p>
+        <div slot="actions">
+          <button-box variant="secondary" size="medium">
+            <button type="button" (click)="cycleColumnGap()">Cycle gap: {{ columnGap() }}</button>
+          </button-box>
+        </div>
+      </card-box>
+
+      <card-box class="reference-card">
+        <h3 slot="header">Static StatTrend</h3>
+        <p>The static <code>trend="up"</code> value is validated from a referenced union.</p>
+        <stat-box value="34" delta="+8 this week" trend="up" [showTrendIndicator]="true">
+          <span slot="title">Resolved aliases</span>
+        </stat-box>
+      </card-box>
+    </columns-box>
+  </section>
+
+  <section aria-labelledby="intent-heading">
+    <div class="section-heading">
+      <div>
+        <p class="kicker">Package-owned Agent Skill</p>
+        <h2 id="intent-heading">Load guidance for the installed version</h2>
+      </div>
+      <p>
+        Intent discovers the skill from the dependency tarball. The skill sends agents to the
+        installed manifest for exact APIs, then provides focused composition and styling references.
+      </p>
+    </div>
+
+    <div class="intent-layout">
+      <div>
+        <h3>Allow the package</h3>
+        <p>
+          This application explicitly trusts <code>@box-model/web</code> as a source of agent
+          guidance.
+        </p>
+        <pre><code>&#123;
+  "intent": &#123;
+    "skills": ["&#64;box-model/web"]
+  &#125;
+&#125;</code></pre>
+      </div>
+
+      <div>
+        <h3>Discover and load</h3>
+        <p>
+          Run these commands from the application root before working with Box Model components.
+        </p>
+        <terminal-box role="region" aria-label="TanStack Intent commands">
+          <terminal-line-box variant="prompt">
+            npx &#64;tanstack/intent&#64;latest list
+          </terminal-line-box>
+          <terminal-line-box variant="prompt">
+            npx &#64;tanstack/intent&#64;latest load &#64;box-model/web#box-model-web
+          </terminal-line-box>
+          <terminal-line-box variant="success">
+            Loaded 34 component examples and style guidance
+          </terminal-line-box>
+        </terminal-box>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="inline-heading">
+    <div class="section-heading">
+      <div>
+        <p class="kicker">Inline primitives</p>
+        <h2 id="inline-heading">Numeric properties and generated elements</h2>
+      </div>
+      <p>
+        The same manifest also checks self-contained primitive types and recognizes related custom
+        elements.
+      </p>
+    </div>
+
+    <div class="progress-demo">
+      <div>
+        <p id="reference-progress-label" class="progress-label">{{ progressLabel() }}</p>
+        <progress-box [value]="progress()" [max]="100" [label]="progressLabel()"></progress-box>
+      </div>
+      <button-box variant="tertiary" size="small">
+        <button type="button" (click)="advanceProgress()">Advance progress</button>
+      </button-box>
+    </div>
+
+    <terminal-box>
+      <terminal-line-box variant="prompt">npm install &#64;box-model/web</terminal-line-box>
+      <terminal-line-box variant="success">
+        custom-elements.json and box-model-web skill resolved
+      </terminal-line-box>
+      <terminal-line-box variant="info" [cursor]="true">
+        Angular template checking and agent guidance active
+      </terminal-line-box>
+    </terminal-box>
+  </section>
+</div>

@@ -1,0 +1,124 @@
+{
+  "schemaVersion": "2.1.0",
+  "readme": "Consumer-authored projection for @material/web, which does not publish a Custom Elements Manifest.",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "button/filled-button.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "MdFilledButton",
+          "customElement": true,
+          "tagName": "md-filled-button",
+          "description": "Material filled button described by an application-owned manifest.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "disabled",
+              "type": { "text": "boolean" },
+              "attribute": "disabled",
+              "description": "Whether the button is disabled."
+            },
+            {
+              "kind": "field",
+              "name": "softDisabled",
+              "type": { "text": "boolean" },
+              "attribute": "soft-disabled",
+              "description": "Whether the button is disabled while remaining focusable."
+            },
+            {
+              "kind": "field",
+              "name": "href",
+              "type": { "text": "string" },
+              "attribute": "href",
+              "description": "The URL used when the button acts as a link."
+            },
+            {
+              "kind": "field",
+              "name": "download",
+              "type": { "text": "string" },
+              "attribute": "download",
+              "description": "The filename used when downloading the linked resource."
+            },
+            {
+              "kind": "field",
+              "name": "target",
+              "type": { "text": "'_blank' | '_parent' | '_self' | '_top' | ''" },
+              "attribute": "target",
+              "description": "Where to display the linked URL."
+            },
+            {
+              "kind": "field",
+              "name": "trailingIcon",
+              "type": { "text": "boolean" },
+              "attribute": "trailing-icon",
+              "description": "Whether the icon renders after the label."
+            },
+            {
+              "kind": "field",
+              "name": "hasIcon",
+              "type": { "text": "boolean" },
+              "attribute": "has-icon",
+              "description": "Whether the button displays an icon."
+            },
+            {
+              "kind": "field",
+              "name": "type",
+              "type": { "text": "'button' | 'reset' | 'submit'" },
+              "attribute": "type",
+              "default": "'submit'",
+              "description": "The button's form behavior."
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "type": { "text": "string" },
+              "attribute": "value",
+              "description": "The value submitted with the button's name."
+            }
+          ],
+          "attributes": [
+            { "name": "disabled", "type": { "text": "boolean" }, "fieldName": "disabled" },
+            {
+              "name": "soft-disabled",
+              "type": { "text": "boolean" },
+              "fieldName": "softDisabled"
+            },
+            { "name": "href", "type": { "text": "string" }, "fieldName": "href" },
+            { "name": "download", "type": { "text": "string" }, "fieldName": "download" },
+            {
+              "name": "target",
+              "type": { "text": "'_blank' | '_parent' | '_self' | '_top' | ''" },
+              "fieldName": "target"
+            },
+            {
+              "name": "trailing-icon",
+              "type": { "text": "boolean" },
+              "fieldName": "trailingIcon"
+            },
+            {
+              "name": "has-icon",
+              "type": { "text": "boolean" },
+              "fieldName": "hasIcon"
+            },
+            {
+              "name": "type",
+              "type": { "text": "'button' | 'reset' | 'submit'" },
+              "fieldName": "type",
+              "default": "'submit'"
+            },
+            { "name": "value", "type": { "text": "string" }, "fieldName": "value" }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "md-filled-button",
+          "declaration": { "name": "MdFilledButton" }
+        }
+      ]
+    }
+  ]
+}

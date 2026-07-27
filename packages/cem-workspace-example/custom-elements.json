@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "2.1.0",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "index.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "name": "CemWorkspaceExampleElement",
+          "customElement": true,
+          "tagName": "cem-workspace-example",
+          "members": [
+            {
+              "kind": "field",
+              "name": "variant",
+              "attribute": "variant",
+              "type": { "text": "'primary' | 'secondary'" }
+            },
+            {
+              "kind": "field",
+              "name": "workspaceOnly",
+              "readonly": true,
+              "type": { "text": "string" }
+            }
+          ],
+          "attributes": [
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "type": { "text": "'primary' | 'secondary'" }
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "CemWorkspaceExampleElement",
+          "declaration": { "name": "CemWorkspaceExampleElement" }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "cem-workspace-example",
+          "declaration": { "name": "CemWorkspaceExampleElement" }
+        }
+      ]
+    }
+  ]
+}

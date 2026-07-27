@@ -1,0 +1,81 @@
+<div class="page">
+  <header>
+    <p class="eyebrow">Angular + Custom Elements Manifest</p>
+    <h1>Shoelace components with strict template checking</h1>
+    <p class="lede">
+      These custom elements are checked from Shoelace's published manifest. No
+      <code>CUSTOM_ELEMENTS_SCHEMA</code> is used.
+    </p>
+  </header>
+
+  <sl-alert variant="success" closable [open]="alertOpen()" (sl-hide)="alertOpen.set(false)">
+    Welcome, {{ name() }}. The manifest recognizes this tag, its attributes, properties, and events.
+  </sl-alert>
+
+  <section aria-labelledby="controls-heading">
+    <h2 id="controls-heading">Interactive controls</h2>
+
+    <div class="form-grid">
+      <sl-input
+        label="Display name"
+        help-text="This value is bound through the custom element's value property."
+        [value]="name()"
+        clearable
+        (sl-input)="handleNameInput($event)"
+      ></sl-input>
+
+      <sl-select
+        label="Component library"
+        [value]="selectedLibrary()"
+        (sl-change)="handleLibraryChange($event)"
+      >
+        <sl-option value="shoelace">Shoelace</sl-option>
+        <sl-option value="other">Another library</sl-option>
+      </sl-select>
+    </div>
+
+    <sl-switch [checked]="notifications()" (sl-change)="handleNotificationsChange($event)">
+      Enable manifest validation notifications
+    </sl-switch>
+  </section>
+
+  <section aria-labelledby="status-heading">
+    <h2 id="status-heading">Typed values and events</h2>
+
+    <div class="status-grid">
+      <article>
+        <h3>Build progress</h3>
+        <sl-progress-bar
+          [value]="progress()"
+          [label]="'Build progress: ' + progress() + '%'"
+        ></sl-progress-bar>
+        <sl-button variant="success" size="small" [outline]="true" (click)="advanceProgress()">
+          Advance progress
+        </sl-button>
+      </article>
+
+      <article>
+        <h3>Integration rating</h3>
+        <sl-rating
+          label="Rate the custom elements integration"
+          [value]="rating()"
+          [max]="5"
+          [precision]="1"
+          (sl-change)="handleRatingChange($event)"
+        ></sl-rating>
+        <p>Current rating: {{ rating() }} / 5</p>
+      </article>
+    </div>
+  </section>
+
+  <sl-details
+    summary="What is being validated?"
+    [open]="detailsOpen()"
+    (sl-show)="detailsOpen.set(true)"
+    (sl-hide)="detailsOpen.set(false)"
+  >
+    Angular knows about each <code>sl-*</code> element through
+    <code>@shoelace-style/shoelace/dist/custom-elements.json</code>. Misspelled tags and properties
+    still produce template diagnostics.
+  </sl-details>
+</div>

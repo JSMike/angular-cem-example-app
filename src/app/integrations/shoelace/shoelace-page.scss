@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.page {
+  width: min(70rem, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+header {
+  max-width: 48rem;
+  margin-bottom: 2rem;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+h2 {
+  margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+  color: var(--sl-color-primary-700);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lede {
+  color: var(--sl-color-neutral-600);
+  font-size: 1.125rem;
+  line-height: 1.6;
+}
+
+section,
+sl-details {
+  display: block;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--sl-color-neutral-200);
+  border-radius: var(--sl-border-radius-large);
+  background: white;
+  box-shadow: var(--sl-shadow-small);
+}
+
+sl-alert {
+  margin-bottom: 2rem;
+}
+
+.form-grid,
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.form-grid {
+  margin-bottom: 1.5rem;
+}
+
+article {
+  padding: 1.25rem;
+  border-radius: var(--sl-border-radius-medium);
+  background: var(--sl-color-neutral-50);
+}
+
+sl-progress-bar,
+sl-rating {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+code {
+  padding: 0.1em 0.35em;
+  border-radius: 0.25rem;
+  background: var(--sl-color-neutral-100);
+}
+
+@media (max-width: 42rem) {
+  .page {
+    padding-top: 2rem;
+  }
+
+  .form-grid,
+  .status-grid {
+    grid-template-columns: 1fr;
+  }
+}
