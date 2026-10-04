@@ -5,6 +5,7 @@
 /tmp
 /out-tsc
 /bazel-out
+/regression/.tmp
 
 # Node
 /node_modules

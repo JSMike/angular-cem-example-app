@@ -1,12 +1,11 @@
 # VS Code Angular CEM plugin review guide
 
-This guide provides a repeatable manual review of the proposed Angular
-`customElementsManifests` integration through the Angular Language Service VS Code extension. It
-uses the examples already present in this repository and covers both successful metadata and the
-feature's intentional fail-closed behavior.
+This guide is a repeatable manual review of Angular's proposed `customElementsManifests` option in
+the Angular Language Service VS Code extension. It uses the examples in this repository and covers
+both usable metadata and what Angular does with metadata it can't use.
 
-The review should establish that manifest-backed custom elements behave like known HTML or Angular
-component APIs in templates without enabling `CUSTOM_ELEMENTS_SCHEMA`:
+The review checks that, without `CUSTOM_ELEMENTS_SCHEMA`, manifest-declared custom elements behave in
+templates like known HTML elements or Angular components:
 
 - tags, properties, attributes, and events are discoverable;
 - finite string values are offered as completions;
@@ -14,12 +13,12 @@ component APIs in templates without enabling `CUSTOM_ELEMENTS_SCHEMA`:
 - static string-literal-union attributes are type-checked;
 - hover text reports manifest documentation and type information;
 - resolvable element classes type local template references;
-- unusable metadata degrades only the affected check rather than disabling template checking; and
-- app-owned manifests can add or correct vendor metadata.
+- unusable metadata turns off only the check that needs it; and
+- manifests in the app can add or correct a library's metadata.
 
 ## 1. Protect the starting state
 
-The checks below deliberately introduce temporary template and manifest errors. Before beginning:
+The checks below add temporary template and manifest errors on purpose. Before you begin:
 
 1. Open this repository as a WSL workspace, not as a Windows filesystem folder:
 
@@ -87,16 +86,15 @@ npm test -- --watch=false
 
 Expected result:
 
-- the installed compiler is the locally built Angular 22.1 development package;
-- `ngc` exits successfully with zero template errors;
-- the current third-party compatibility matrix emits 25 bounded summary warnings; and
+- the installed compiler is the locally built Angular 22.3 development package;
+- `ngc` succeeds with no template errors;
+- the configured libraries produce 20 summarized manifest warnings; and
 - all eight application tests pass.
 
-The third-party warnings are fixtures, not a failed setup. Their compatibility boundaries are
-summarized in the
-[implementation summary](./angular-cem-implementation-summary.md#real-package-results).
+The warnings come from the libraries' manifests and are expected. The
+[implementation summary](./angular-cem-implementation-summary.md#real-package-results) explains them.
 
-Confirm that blanket schema suppression is absent:
+Confirm that no component uses `CUSTOM_ELEMENTS_SCHEMA` or `NO_ERRORS_SCHEMA`:
 
 ```bash
 rg 'CUSTOM_ELEMENTS_SCHEMA|NO_ERRORS_SCHEMA' src
@@ -120,7 +118,7 @@ In a temporary blank line inside the page, type each prefix and invoke Ctrl+Spac
 
 Expected suggestions include:
 
-- `md-filled-button` from the app-owned Material manifest;
+- `md-filled-button` from the app's Material manifest;
 - `sp-button`, `sp-theme`, and `sp-textfield` from the Spectrum manifests; and
 - `cem-workspace-example` from the local package manifest.
 
@@ -153,8 +151,8 @@ Use the existing `<sl-rating>` in `shoelace-page.html`.
 
    Expected result: NG8001 reports that `sl-ratting` is not a known element.
 
-Undo both typos. These checks demonstrate that the feature adds knowledge rather than suppressing
-unknown tags and properties.
+Undo both typos. These checks show that manifests tell Angular about elements instead of hiding
+errors for unknown tags and properties.
 
 ## 6. Distinguish expression errors from value-type errors
 
@@ -186,16 +184,16 @@ Continue with the existing `<sl-rating>`.
 
 4. Restore `[precision]="1"`.
 
-5. As an intentional boundary check, temporarily use a static value:
+5. To check a known limit, temporarily use a static value:
 
    ```html
    precision="not-a-number"
    ```
 
-   Expected result: hover still reports the numeric metadata, but there is no static-value error.
-   CEM describes the deserialized property type and does not standardize each library's numeric or
-   boolean attribute converter. Angular therefore reserves static value validation for explicit
-   string-literal unions; property bindings remain strictly checked.
+   Expected result: hover still shows the numeric type, but there is no static-value error. CEM
+   describes the property's type but doesn't define how a library converts attribute strings to
+   numbers or booleans, so Angular checks static values only against unions of string literals.
+   Property bindings are still type-checked.
 
 Restore the original binding.
 
@@ -228,9 +226,9 @@ and use the first `<tag-box variant="info">`.
 
 7. Restore the original `variant="info"`.
 
-Optional serialization boundary: `variant="{{ 'success' }}"` is typed as a serialized `string`,
-not preserved as the literal type `'success'`. A finite-union diagnostic is therefore expected;
-use a static value or `[variant]="'success'"` when literal precision is required.
+Optional: `variant="{{ 'success' }}"` has the type `string`, not the literal type `'success'`,
+because interpolation produces a string, so an error is expected. Use a static value or
+`[variant]="'success'"` instead.
 
 ## 8. Verify `type.references` and exact property names
 
@@ -238,8 +236,8 @@ Remain in `box-model-page.html`.
 
 1. Hover `[variant]` on `<button-box [variant]="buttonVariant()">`.
 
-   Expected result: quick info reports the public `ButtonVariant` alias resolved through the
-   manifest's `type.references`.
+   Expected result: quick info shows the exported `ButtonVariant` type that the manifest's
+   `type.references` points to.
 
 2. Hover `[gap]` and `[minWidth]` on `<columns-box>`.
 
@@ -255,10 +253,9 @@ Remain in `box-model-page.html`.
 
    Expected result: the incorrectly cased property is rejected. Restore the original element.
 
-This verifies that manifest property names are not silently rewritten to similarly spelled DOM
-properties.
+This shows that Angular doesn't rename manifest properties to similarly spelled DOM properties.
 
-## 9. Verify the app-owned Material manifest
+## 9. Verify the app's Material manifest
 
 Open `design-systems-page.html` and use `<md-filled-button>`.
 
@@ -272,14 +269,15 @@ Open `design-systems-page.html` and use `<md-filled-button>`.
 
 3. Restore `target="_self"`.
 
-4. Hover `[type]`, `[softDisabled]`, and `[disabled]`. Confirm their app-owned types are visible.
+4. Hover `[type]`, `[softDisabled]`, and `[disabled]`. Confirm that the types from the app's
+   manifest are shown.
 
 5. Temporarily change `[type]="materialButtonType()"` to `[type]="'link'"`.
 
    Expected result: `'link'` is rejected because the local manifest declares only `button`,
    `reset`, and `submit`. Restore the signal binding.
 
-To prove that this is genuinely filling missing vendor metadata:
+To confirm that this manifest supplies metadata the library doesn't publish:
 
 1. Temporarily remove
    `"./src/custom-elements/material-web-button.custom-elements.json"` from `tsconfig.json`.
@@ -295,7 +293,7 @@ To prove that this is genuinely filling missing vendor metadata:
 4. Restore the manifest entry, save, restart the language server, and confirm completion and
    checking return.
 
-## 10. Verify the corrected Spectrum replacement manifest
+## 10. Verify the app's corrected Spectrum manifest
 
 Use `<sp-button>` in `design-systems-page.html`.
 
@@ -307,12 +305,12 @@ Use `<sp-button>` in `design-systems-page.html`.
 
 3. Enter `variant="not-real"`.
 
-   Expected result: the local replacement manifest rejects the value.
+   Expected result: the app's manifest rejects the value.
 
 4. Restore `[variant]="spectrumVariant()"`.
 
-5. Hover `[disabled]`. Confirm that the inherited property deliberately added by the app-owned
-   projection is known and typed as `boolean`.
+5. Hover `[disabled]`. Confirm that the inherited property, which the app's manifest adds on
+   purpose, is known and typed as `boolean`.
 
 Optional before/after comparison:
 
@@ -324,14 +322,13 @@ Optional before/after comparison:
 
 3. Repeat the `variant=""` and invalid-value checks.
 
-   Expected result: the vendor spelling remains available as descriptive metadata, but its named
-   type lacks the references Angular needs for trusted value checking and finite completions. The
-   corresponding NG4013 warning explains the narrow fallback.
+   Expected result: hover still shows the library's type text, but its named type has no references,
+   so Angular doesn't check the value or suggest values. An NG4013 warning reports this.
 
 4. Restore the local manifest entry and restart the language server.
 
-This demonstrates that the consumer override replaces unusable metadata; Angular does not silently
-substitute a different type from the vendor's `.d.ts` files.
+This shows that the app's manifest replaces unusable metadata. Angular doesn't substitute a type from
+the library's `.d.ts` files.
 
 ## 11. Verify typed local references
 
@@ -366,7 +363,7 @@ The design-systems page already contains:
    Expected result: the valid member is known, and the invalid member is rejected against the
    Shoelace element class. Remove the temporary reference and paragraph.
 
-## 12. Verify event discovery and honest fallback types
+## 12. Verify event completions and fallback types
 
 Use the existing `(sl-change)` binding on `<sl-rating>` or `(sl-input)` on `<sl-input>`.
 
@@ -376,9 +373,8 @@ Use the existing `(sl-change)` binding on `<sl-rating>` or `(sl-input)` on `<sl-
 
 2. Hover the event name and `$event`.
 
-   Expected result for the current Shoelace manifest: documentation is available, while `$event`
-   remains `Event`. Shoelace omits a standards-valid event payload type, so Angular does not invent
-   one.
+   Expected result for the current Shoelace manifest: documentation is shown, and `$event` is
+   `Event`. Shoelace's manifest has no usable event type, so Angular doesn't make one up.
 
 3. In `design-systems-page.html`, hover `$event` in the RHDS switch `(change)` binding.
 
@@ -386,19 +382,19 @@ Use the existing `(sl-change)` binding on `<sl-rating>` or `(sl-input)` on `<sl-
 
 4. Hover `$event` in UI5's `(click)` binding.
 
-   Expected result: it remains the native event fallback because the nested manifest reference
-   lacks the exact `start`/`end` spans required for safe substitution.
+   Expected result: it has the native event type, because the manifest's reference for the name
+   inside the type has no `start` and `end` offsets.
 
-The Language Service should not offer Angular-style two-way bindings for manifest properties.
-Writing `[(value)]` manually would listen for `valueChange`, which most web components do not emit;
-use separate property and documented event bindings.
+The Language Service doesn't suggest two-way bindings for manifest properties. A hand-written
+`[(value)]` listens for `valueChange`, which most web components don't dispatch; bind the property
+and the library's event separately.
 
-## 13. Verify narrow fallback rather than blanket suppression
+## 13. Verify that unusable types turn off only their own checks
 
-Use `<sp-textfield>` in `design-systems-page.html`. Its vendor manifest has some unusable named type
-metadata, but the element and its unrelated valid members remain known.
+Use `<sp-textfield>` in `design-systems-page.html`. Some of its manifest's named types are unusable,
+but the element and its other members are still known.
 
-1. Hover `value`, `maxlength`, and `type` to compare usable and descriptive metadata.
+1. Hover `value`, `maxlength`, and `type` to compare types Angular uses with types it only shows.
 
 2. Temporarily add `[notARealTextfieldProperty]="true"`.
 
@@ -410,19 +406,18 @@ metadata, but the element and its unrelated valid members remain known.
    [type]="'not-a-spectrum-type'"
    ```
 
-   Expected result: only that dependent value check is absent because the vendor's `type` metadata
-   was rejected; the tag, other members, hover text, and unknown-property checking remain active.
+   Expected result: only this value isn't checked, because Angular rejected the manifest's type for
+   `type`. The tag, other members, hover text, and unknown-property checks still work.
 
 4. Remove both temporary properties.
 
-As an explicit attribute escape hatch, `[attr.variant]="'not-real'"` writes an attribute and does
-not use the manifest property type. This matches Angular's normal `[attr.*]` semantics and should
-not be mistaken for a failed property check.
+`[attr.variant]="'not-real'"` sets an attribute and isn't checked against the manifest's property
+type. This is Angular's usual `[attr.*]` behavior, not a missed check.
 
 ## 14. Verify manifest resource reload
 
-This check proves that editor state updates when a configured manifest changes without requiring a
-TypeScript source edit.
+This check shows that the editor updates when a configured manifest changes, without a TypeScript
+edit.
 
 1. Open
    [`src/custom-elements/material-web-button.custom-elements.json`](./src/custom-elements/material-web-button.custom-elements.json).
@@ -439,32 +434,32 @@ TypeScript source edit.
 
 5. Remove `review-only` from both manifest unions and save, without editing the template.
 
-   Expected result: the existing template value becomes invalid. This proves the manifest resource
-   invalidated and rebuilt the template checker.
+   Expected result: the unchanged template value is now an error, so saving the manifest rebuilt the
+   template checks.
 
 6. Restore `target="_self"` and confirm the error clears.
 
-If the update does not arrive within a few seconds, inspect the Angular Language Service Output
-channel before restarting it; needing a restart is itself a review finding.
+If the update doesn't appear within a few seconds, check the Angular Language Service Output channel
+before restarting the server. Needing a restart is itself a bug to report.
 
 ## 15. Verify configured-manifest diagnostics
 
-These checks are optional but useful when reviewing the error contract. Perform them one at a time
-and restore each edit immediately.
+These checks are optional and review the error diagnostics. Do them one at a time and undo each edit
+right away.
 
 ### Missing configured resource
 
 Temporarily change the Material manifest entry in `tsconfig.json` to a nonexistent path and save.
 
-Expected result: NG4007 identifies the configured manifest as unresolved or unreadable, and the
-Material schema is not loaded. Restore the correct path.
+Expected result: NG4007 reports that the entry doesn't resolve to a file, and the Material elements
+are unknown. Restore the correct path.
 
 ### Malformed manifest
 
 Temporarily introduce invalid JSON into the Material manifest and save.
 
-Expected result: NG4008 identifies the invalid manifest; Angular does not ingest a partial schema
-from malformed JSON. Undo the JSON edit and save.
+Expected result: NG4008 reports that the manifest isn't valid JSON, and Angular loads nothing from
+it. Undo the JSON edit and save.
 
 ### Invalid diagnostics option
 
@@ -474,10 +469,10 @@ Temporarily add the following sibling option under `angularCompilerOptions`:
 "customElementsManifestsDiagnostics": "loud"
 ```
 
-Expected result: NG4012 identifies the invalid compiler-option value. Valid values are `summary`
-and `verbose`. Remove the temporary option.
+Expected result: NG4012 reports the invalid option value. The valid values are `summary` and
+`verbose`. Remove the temporary option.
 
-### Verbose producer diagnostics
+### Verbose diagnostics
 
 Temporarily set:
 
@@ -491,14 +486,14 @@ Run:
 ./node_modules/.bin/ngc -p tsconfig.app.json --noEmit
 ```
 
-Expected result: the same successful compilation expands the 25 bounded summary warnings into
-1,802 individual findings (19 NG4009 + 330 NG4011 + 1,153 NG4013 + 300 NG4014). Restore the
-default by removing the option.
+Expected result: compilation still succeeds, and the 20 summarized warnings become 1,636 individual
+warnings (19 NG4009, 134 NG4010, 330 NG4011, and 1,153 NG4013). Remove the option to restore the
+default.
 
 ## 16. Run the automated editor-protocol smoke test
 
-The repository includes a protocol-level harness that launches the freshly built language server
-from `../angular`, measures completion latency, and asserts the two consumer-owned completion sets:
+`ls-perf/harness.js` starts the language server built in `../angular` over the Language Server
+Protocol, times completions, and checks the completions from the app's two manifests:
 
 ```bash
 node ls-perf/harness.js --edits 3
@@ -528,11 +523,10 @@ Visit:
 
 - `http://localhost:4200/` for Shoelace;
 - `http://localhost:4200/box-model` for referenced aliases; and
-- `http://localhost:4200/design-systems` for the compatibility matrix and both app-owned manifests.
+- `http://localhost:4200/design-systems` for the design systems and the app's two manifests.
 
-Confirm that the controls render and respond. Runtime behavior does not replace Language Service
-review, but it catches a manifest projection that describes a property name differently from the
-actual custom element implementation.
+Confirm that the controls render and respond. This doesn't replace the editor review, but it catches
+a manifest whose property names differ from the element's actual properties.
 
 Finally:
 
@@ -551,14 +545,14 @@ Finally:
 - [ ] Unknown custom-element tags and properties still produce NG8001/NG8002.
 - [ ] Property bindings reject incompatible values.
 - [ ] Static string-literal unions provide completions and reject invalid values.
-- [ ] Numeric/boolean static attributes retain metadata without assuming a universal converter.
+- [ ] Number and boolean static attributes show their type but aren't value-checked.
 - [ ] Exact property names and casing are preserved.
 - [ ] `type.references` resolve public named aliases.
 - [ ] Resolvable element classes type local references.
-- [ ] Event names are discoverable and untrusted payload metadata falls back honestly.
-- [ ] Unusable metadata degrades narrowly without disabling unrelated checks.
-- [ ] The Material app-owned manifest fills a package-level metadata gap.
-- [ ] The Spectrum app-owned manifest replaces defective vendor typing.
+- [ ] Event names complete, and events without a usable type use the native event type.
+- [ ] Unusable metadata turns off only the checks that need it.
+- [ ] The app's Material manifest supplies metadata the library doesn't publish.
+- [ ] The app's Spectrum manifest replaces the library's unusable types.
 - [ ] Saved manifest edits refresh diagnostics and completions without a server restart.
 - [ ] NG4007, NG4008, NG4012, and summary/verbose diagnostics behave as documented.
 - [ ] Protocol smoke test, compiler check, unit tests, production build, and runtime smoke pass.

@@ -10,12 +10,12 @@ Optional Angular CLI follow-up work can also be exercised from the
 Michael Cebrian's Angular CLI fork. That branch is not required for the compiler feature and should
 not become an Angular CLI pull request unless the underlying Angular feature is accepted first.
 
-The feature lets Angular consume standards-based
+The feature lets Angular read
 [Custom Elements Manifests](https://github.com/webcomponents/custom-elements-manifest) during AOT
-template compilation. Manifest-declared custom elements then receive known-element checks,
-property and static-attribute validation, event payload types, typed local references,
-documentation, and Language Service completions without using `CUSTOM_ELEMENTS_SCHEMA` as blanket
-template-check suppression.
+compilation. For the elements a manifest declares, Angular checks tags, properties, static
+attributes, events, and local references, and the Language Service offers completions and
+documentation. Templates no longer need `CUSTOM_ELEMENTS_SCHEMA`, which turns off these checks for
+every tag that contains a dash.
 
 > The feature branch must contain the reviewed changes before another developer can reproduce this
 > project. For a durable review link, use the exact Angular commit SHA rather than relying only on
@@ -39,12 +39,12 @@ cover:
 - `type.references` resolved against published TypeScript declarations;
 - self-contained primitive, literal-union, array, and inline object types;
 - static attribute values, property bindings, events, and strict local references;
-- malformed or incomplete real-world manifests and Angular's narrow diagnostic fallbacks.
+- malformed or incomplete published manifests, and the warnings Angular reports for them.
 
-Lion uses a focused checked-in projection during routine editor work because its published manifest
-is 5.8 MB and contains unrelated test and dependency declarations. The full file is covered by the
-acceptance measurements. The in-repo `@local/cem-workspace-example` package exercises a
-consumer-authored package manifest and typed local references through a workspace symlink.
+Lion uses a smaller checked-in copy of its manifest, because the published one is 5.8 MB and
+includes test and dependency declarations. [`ls-perf/measurements.md`](./ls-perf/measurements.md)
+covers the full file. The in-repo `@local/cem-workspace-example` package shows an application-written
+package manifest and typed local references through a workspace symlink.
 
 ## Prerequisites
 
@@ -155,9 +155,13 @@ Angular supports three entry forms:
 | `"@my/lib/custom-elements.json"` | Resolve an explicitly exported JSON module within a package.                   |
 | `"./custom-elements.json"`       | Load a path relative to the final project `tsconfig.json`.                     |
 
+As with tsconfig `extends`, only entries starting with `./`, `../`, or an absolute path are file
+paths. A bare `custom-elements.json` is a module specifier; when it fails to resolve and the project
+file exists, `NG4007` suggests `./custom-elements.json`.
+
 Relative entries inherited through `extends` are still relative to the final project's
-`tsconfig.json`; TypeScript does not rebase them against the configuration file that originally
-declared the option.
+`tsconfig.json`; Angular merges inherited `angularCompilerOptions` without rebasing them against the
+configuration file that originally declared the option. `NG4007` names the directory it used.
 
 ### Supply application-owned metadata
 
@@ -213,11 +217,11 @@ focused manifest and configuring its relative path. This is the pattern used by
 }
 ```
 
-When a field exposes an attribute, standards-conforming metadata also lists the corresponding
-record in the declaration's `attributes` array and connects it with `fieldName`. Angular reports
-inconsistent consumed records through `NG4014` rather than inventing the missing relationship.
+When a field has an attribute, the manifest also lists the attribute in the declaration's
+`attributes` array and links it back with `fieldName`. When these records don't match, Angular
+reports `NG4014` and does not add the missing record.
 
-Named types should use CEM `type.references` that identify the exact public type export:
+Named types need `type.references` entries that name the exact exported type:
 
 ```json
 {
@@ -233,7 +237,7 @@ Named types should use CEM `type.references` that identify the exact public type
 }
 ```
 
-Names inside compound types require exact `start` and `end` offsets. Platform types use
+A name inside a larger type needs exact `start` and `end` offsets. Platform types use
 `package: "global:"`:
 
 ```json
@@ -250,9 +254,8 @@ Names inside compound types require exact `start` and `end` offsets. Platform ty
 }
 ```
 
-Manifest order is significant. The first declaration for a tag wins, matching the first successful
-`customElements.define()` call at runtime. This lets an application put a corrected subset
-manifest before a vendor manifest:
+Order matters: the first declaration of a tag wins, as the first `customElements.define()` call does
+at runtime. To correct some of a library's tags, list your manifest before the library's:
 
 ```json
 {
@@ -265,32 +268,31 @@ manifest before a vendor manifest:
 }
 ```
 
-The later duplicate produces `NG4010`, but the application-controlled definition remains
-authoritative. A local workspace package is preferable when the correction must also provide an
-importable element class for strict `#ref` typing.
+The library's later declarations produce an expected `NG4010` warning, and Angular uses yours. To
+also type `#ref` with the element class, publish the correction as a local workspace package
+instead, like `@local/cem-workspace-example`.
 
 ### Register components at runtime
 
-A manifest supplies compile-time metadata; it does not register custom elements in the browser.
-Continue importing the package or its component entrypoints:
+A manifest only describes elements to the compiler; it doesn't register them in the browser. Keep
+importing the package or its component entry points:
 
 ```ts
 import '@box-model/web/tag.js';
 import '@shoelace-style/shoelace/dist/components/rating/rating.js';
 ```
 
-With a manifest configured, the corresponding Angular components generally should not need
-`CUSTOM_ELEMENTS_SCHEMA`. The two mechanisms can coexist during migration: manifest-declared tags
-remain precisely checked, while `CUSTOM_ELEMENTS_SCHEMA` continues allowing other unknown
-hyphenated tags.
+Components that use only manifest-declared elements don't need `CUSTOM_ELEMENTS_SCHEMA`. During a
+migration you can use both: manifest tags are still fully checked, and `CUSTOM_ELEMENTS_SCHEMA`
+allows other tags that contain a dash.
 
 ## Template behavior to review
 
 ### Elements and member names
 
-Manifest-declared tags do not produce `NG8001`. Declared writable properties and events are known,
-while misspelled or undeclared property bindings still produce `NG8002`. Read-only fields and
-attribute-only declarations do not authorize property assignment.
+Manifest-declared tags don't produce `NG8001`. Declared writable properties and events are known.
+Bindings to misspelled or undeclared properties produce `NG8002`, as do bindings to read-only properties
+and to names declared only as attributes.
 
 ```html
 <!-- Known tag and property. -->
@@ -303,18 +305,16 @@ attribute-only declarations do not authorize property assignment.
 <some-element [attr.data-mode]="mode()"></some-element>
 ```
 
-Manifest JavaScript property names retain their exact spelling during code generation rather than
-being remapped through native HTML aliases. Standard inherited DOM properties that are not
-redeclared continue using Angular's normal mapping.
+Angular sets manifest properties by their exact names, so `[readonly]` sets `readonly` rather than
+`readOnly`. Standard DOM properties that the manifest doesn't declare keep Angular's usual mapping.
 
 ### Bound values
 
-With strict template checking, Angular checks property values when the manifest provides either:
+With strict template checking, Angular checks property values when the manifest's type is either:
 
-- self-contained safe type text such as `boolean`, `'primary' | 'secondary'`,
-  `{value: string}`, or `string[]`; or
-- named types whose occurrences are located by valid `type.references` and resolve to exported
-  TypeScript declarations.
+- type text without names, such as `boolean`, `'primary' | 'secondary'`, `{value: string}`, or
+  `string[]`; or
+- named types that `type.references` locates and that resolve to exported TypeScript declarations.
 
 ```html
 <!-- Numeric expression: checked against the number property. -->
@@ -327,7 +327,7 @@ With strict template checking, Angular checks property values when the manifest 
 <sl-rating [precision]="'a'"></sl-rating>
 ```
 
-Interpolation serializes to a string. Use a property binding to preserve a non-string value:
+Interpolation produces a string. Use a property binding for other types:
 
 ```html
 <!-- String serialization; invalid for a number property. -->
@@ -339,40 +339,37 @@ Interpolation serializes to a string. Use a property binding to preserve a non-s
 
 ### Static attributes and completions
 
-Static attribute values are strictly checked only when the manifest explicitly declares a string
-literal union. This also provides editor value completions:
+Static attribute values are checked only when the manifest declares a union of string literals.
+The editor also suggests those values:
 
 ```html
 <!-- Completion and validation: "primary" | "secondary" | ... -->
 <tag-box variant="primary"></tag-box>
 ```
 
-Static number and boolean spellings remain existence-checked because CEM does not define one
-universal attribute conversion algorithm. Their bound JavaScript properties remain fully typed:
+Static number and boolean attributes aren't value-checked, because CEM doesn't define how attribute
+strings convert to other types. Bind the property to check the value:
 
 ```html
 <some-element count="1" disabled></some-element>
 <some-element [count]="count()" [disabled]="disabled()"></some-element>
 ```
 
-Values written as `[attr.name]` follow Angular's general attribute serialization and are not
-checked against manifest property types.
+Values bound with `[attr.name]` become attribute strings and aren't checked against manifest types.
 
 ### Events
 
-When the manifest supplies a trustworthy event type, `$event` receives that type:
+When the manifest gives an event a supported type, `$event` has that type:
 
 ```html
 <alert-box (close)="dismissAlert($event)"></alert-box>
 ```
 
-An event such as `CustomEvent<{value: string}>` must identify `CustomEvent` through a
-`type.references` entry using `package: "global:"`. Unusable event metadata falls back to standard
-DOM event inference without erasing unrelated checks.
+For a type such as `CustomEvent<{value: string}>`, `type.references` must include `CustomEvent`
+with `package: "global:"`. Without a supported type, `$event` has the native DOM event type.
 
-Manifest properties are not offered as two-way binding completions. Angular does not infer a
-mapping between a property and arbitrary web-component events such as `count-changed`. Prefer
-explicit input and event bindings:
+The editor doesn't suggest two-way bindings for manifest properties, and Angular doesn't map events
+such as `count-changed` to properties. Bind the property and the event separately:
 
 ```html
 <counter-box [count]="count()" (countChange)="count.set($event.detail)"></counter-box>
@@ -380,34 +377,36 @@ explicit input and event bindings:
 
 ### Local references
 
-For a package-based manifest whose declaration class resolves to exported TypeScript declarations,
-a template reference receives the web-component class:
+When the manifest entry names a package and the element's class resolves to an exported TypeScript
+declaration, a template reference has the class type:
 
 ```html
 <tag-box #tag variant="info"></tag-box>
 <!-- tag is the package's Tag class rather than HTMLElement. -->
 ```
 
-Path-only manifests or unresolved class references fall back to `HTMLElement`.
+With a file entry, or when the class doesn't resolve, the reference is an `HTMLElement`. When the
+class's typings don't declare that it extends `HTMLElement`, the reference has the class combined
+with `HTMLElement`, so native events such as `(click)` are still typed. If the class's members
+conflict with `HTMLElement`, the reference is an `HTMLElement` and Angular reports `NG4013`.
 
 ## Manifest diagnostics
 
-Configuration and producer-metadata problems use codes `NG4007` through `NG4014`. Angular retains
-unrelated valid metadata whenever it can:
+Manifest problems use codes `NG4007` through `NG4014`. When part of a manifest is invalid, Angular
+keeps the rest:
 
-| Code     | Meaning                                                                      |
-| -------- | ---------------------------------------------------------------------------- |
-| `NG4007` | The configured manifest cannot be resolved or read.                          |
-| `NG4008` | The resolved file is not valid JSON or not a manifest object.                |
-| `NG4009` | A declaration uses an invalid custom-element tag name.                       |
-| `NG4010` | A later declaration duplicates a tag; the first declaration wins.            |
-| `NG4011` | A validated type reference cannot resolve to usable TypeScript declarations. |
-| `NG4012` | The compiler option is not an array of non-empty strings.                    |
-| `NG4013` | Declared type metadata cannot safely be emitted into template checks.        |
-| `NG4014` | Consumed manifest records are structurally inconsistent.                     |
+| Code     | Meaning                                                                                 |
+| -------- | --------------------------------------------------------------------------------------- |
+| `NG4007` | An entry doesn't resolve to a file, or the file can't be read.                          |
+| `NG4008` | The file isn't valid JSON or isn't a manifest object.                                   |
+| `NG4009` | A declaration's tag isn't a valid custom element name.                                  |
+| `NG4010` | A tag is declared more than once; Angular uses the first declaration.                   |
+| `NG4011` | A type reference doesn't resolve to TypeScript declarations.                            |
+| `NG4012` | `customElementsManifests` or `customElementsManifestsDiagnostics` has an invalid value. |
+| `NG4013` | Angular can't use some type metadata for type checking.                                 |
+| `NG4014` | Records are inconsistent with each other.                                               |
 
-Warnings of the same kind are summarized per manifest by default. To inspect every affected
-declaration or reference:
+By default, Angular combines warnings of the same kind for each manifest. To list each problem:
 
 ```json
 {
@@ -417,13 +416,12 @@ declaration or reference:
 }
 ```
 
-Prefer the explicit compiler option for repeatable results. The optional Angular CLI follow-up
-branch additionally maps its application builder's `--verbose` flag to verbose CEM diagnostics for
-a one-off run.
+The optional Angular CLI follow-up branch also maps the application builder's `--verbose` flag to
+this option for one run.
 
-Unusable type text is never silently replaced with a `.d.ts` type. The declaration remains known,
-but the affected binding/event check falls back narrowly. An application can configure a corrected
-manifest it controls instead of waiting for a vendor update.
+Angular never replaces unusable type text with a type from `.d.ts` files. The declaration stays
+known, and only the checks that need the type are skipped. To fix a library's metadata without
+waiting for a release, configure a corrected manifest.
 
 ## Run and verify the demo
 
@@ -439,28 +437,71 @@ Then visit:
 - <http://localhost:4200/box-model>
 - <http://localhost:4200/design-systems>
 
-Run compiler, production-build, and unit-test checks:
+Run compiler, production-build, unit-test, and compiler regression checks:
 
 ```bash
 ./node_modules/.bin/ngc -p tsconfig.app.json --noEmit
 npm run build
 npm test -- --watch=false
+npm run test:regression
 ```
 
-The current verified compiler baseline is 25 summarized CEM warnings and zero errors. These
-warnings intentionally demonstrate real producer compatibility issues. Verbose mode expands them
-into individual findings. The observed boundaries are summarized in the
-[implementation summary](./angular-cem-implementation-summary.md#real-package-results).
+[`regression/run.mjs`](./regression/run.mjs) compiles small generated projects under
+`regression/.tmp` with the installed compiler. Each scenario reproduces a review finding and fails
+against a compiler without the corresponding fix:
+
+| Scenario                                           | Checks                                                                                        |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `partial-declaration-requires-linker-22.3`         | Partial declarations with exact property names require linker `22.3.0`.                       |
+| `bare-json-entry-suggests-path`                    | A bare `custom-elements.json` entry reports `NG4007` suggesting `./custom-elements.json`.     |
+| `inherited-relative-entry-names-project-directory` | `NG4007` for an entry inherited through `extends` names the project directory it resolved in. |
+| `element-class-without-htmlelement-heritage`       | `(click)` on an element whose class omits `HTMLElement` heritage type-checks.                 |
+| `rebuild-after-global-type-added`                  | An incremental rebuild rechecks templates after a referenced `global:` type is declared.      |
+| `rebuild-after-package-declaration-fixed`          | An incremental rebuild rechecks templates after package declarations export a missing type.   |
+| `unclaimed-event-names-accept-manifest-events`     | With `strictUnclaimedEventNames`, events a manifest declares aren't reported as unclaimed.    |
+| `demo-app-diagnostics-baseline`                    | This app still reports 20 summarized CEM warnings and no errors.                              |
+
+The rebuild scenarios reuse the previous program with a caching compiler host, as `ng serve` does,
+and first confirm that a fresh build reports the expected error. Pass part of a scenario name to
+run a subset, for example `npm run test:regression -- rebuild`.
+
+The baseline verified on 2026-10-03 with Angular `22.3.0-next.0+sha-e730eba` is 20 CEM warnings
+in default summary mode and zero errors. `ngc`, the production build, all eight unit tests, and the
+regression scenarios passed. The language-service completion harness and browser checks were last
+run against the 2026-09-29 baseline.
+
+The 2026-10-03 cleanup stopped reporting manifest records that don't affect checking, such as
+missing definition exports and events without a `type`. That removed 300 `NG4014` warnings in
+verbose mode and 8 summary warnings; the other counts are unchanged.
+
+The 2026-09-29 baseline, with Angular `22.3.0-next.0+sha-0bd3c70`, was 28 CEM warnings. The
+production build, all eight unit tests, the language-service completion harness, and browser checks
+across all three routes passed.
+
+The review fixes in Angular fixup commit `1a7c3a4` were verified the same day. Summary and verbose
+CEM diagnostics were identical to that baseline, and `ngc`, the production build, all eight unit
+tests, and the regression scenarios passed. The language-service harness and browser checks
+were not rerun for the fixup. The diagnostic messages were reworded after the fixup; their codes,
+order, and counts are unchanged, and the regression scenarios still pass.
+
+Before 2026-09-29, the baseline was 25 warnings. The three `NG4010` warnings added then are for UI5,
+Fluent UI, and RHDS: the compiler now reports a tag registered twice even when both registrations
+name the same declaration, and uses the first. Verbose mode lists 134 findings for these three
+warnings; the other counts are unchanged. All current warnings are expected for the configured
+manifests. The production build also reports two warnings unrelated to manifests: deprecated Sass
+`@import` usage and Spectrum's CommonJS `focus-visible` dependency.
+
+The [implementation summary](./angular-cem-implementation-summary.md#real-package-results) lists
+the counts by code and what each library's warnings mean.
 
 ## Optionally test the Angular CLI follow-up
 
-The `cem-cli-followups` branch is deliberately separate from the compiler feature. It is available
-for integration testing and for reusing this demo in a later Angular CLI pull request, but that
-pull request should wait until Angular accepts the underlying CEM feature.
+The `cem-cli-followups` branch is separate from the compiler feature. Use it for integration testing;
+an Angular CLI pull request from it should wait until Angular accepts the compiler feature.
 
-The branch currently explores three follow-ups:
+The branch has three follow-ups:
 
-- suppress unchanged warning-category compiler option diagnostics on subsequent watch rebuilds;
+- don't repeat unchanged compiler-option warnings on watch rebuilds;
 - map the application builder's `--verbose` option to
   `customElementsManifestsDiagnostics: "verbose"`;
 - add Angular CLI regression coverage for manifest edits and creation during a watch build.
@@ -590,17 +631,20 @@ The complete manual procedure is in
 
 ## Important boundaries
 
-- The integration is an AOT compiler feature. Classic JIT/Karma TestBed compilation and runtime
-  template overrides may still require `CUSTOM_ELEMENTS_SCHEMA`; the modern Angular Vitest builder
-  AOT-compiles tests and consumes the manifests.
-- Directive host bindings do not have access to the consuming component's manifests and retain
-  native DOM property-name mapping.
-- Manifest inheritance and mixin references are not expanded; inherited members must be listed on
-  the custom-element declaration.
-- Properties whose case-insensitive name starts with `on` still encounter Angular's existing DOM
-  event-property security restriction. Prefer the component's attribute or supported alternate API.
-- Whether edits under ignored dependency directories trigger an immediate rebuild depends on the
-  host watcher. Application-owned manifest files are tracked as compilation resources.
+- Only the AOT compiler reads manifests. Karma-based `TestBed` tests, `TestBed.overrideComponent`
+  templates, and JIT bootstrap still need `CUSTOM_ELEMENTS_SCHEMA`. The Angular Vitest builder
+  compiles tests with AOT, so those tests use the manifests.
+- Directive host bindings compile without the component's manifests, so `host: {'[readonly]': ...}`
+  still sets `readOnly`.
+- Angular doesn't follow `superclass` or `mixins`; the manifest must list inherited members on each
+  element's declaration.
+- Angular's security checks reject property bindings whose names start with `on` (ignoring case),
+  even when a manifest declares them. Use the attribute instead.
+- Whether a change under `node_modules` triggers a rebuild depends on the build tool's file
+  watching. Angular reloads project manifest files when the build tool reports that they changed.
+  Each incremental rebuild also compares the
+  validated types with the previous build, so a change to a referenced declaration or global type
+  rechecks all templates.
 
 ## Load the Box Model Agent Skill
 
@@ -619,9 +663,9 @@ Storybook-derived composition examples plus public CSS/Sass utility guidance.
 
 - [`vscode-cem-plugin-review-guide.md`](./vscode-cem-plugin-review-guide.md) — step-by-step manual
   Language Service review.
-- [`angular-cem-implementation-summary.md`](./angular-cem-implementation-summary.md) — completed
-  feature hardening, integration results, and verification.
+- [`angular-cem-implementation-summary.md`](./angular-cem-implementation-summary.md) — hardening
+  work, results against published libraries, and verification.
 - [`angular-cem-related-open-issues.md`](./angular-cem-related-open-issues.md) — related Angular
-  issues and explicitly out-of-scope runtime/forms concerns.
-- [`ls-perf/measurements.md`](./ls-perf/measurements.md) — large-manifest Language Service
-  measurements and diagnostics-navigation memory analysis.
+  issues, and runtime and forms concerns that are out of scope.
+- [`ls-perf/measurements.md`](./ls-perf/measurements.md) — Language Service and compiler timings,
+  and the memory cost of diagnostics that link into manifests.
