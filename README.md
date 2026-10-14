@@ -669,3 +669,11 @@ Storybook-derived composition examples plus public CSS/Sass utility guidance.
   issues, and runtime and forms concerns that are out of scope.
 - [`ls-perf/measurements.md`](./ls-perf/measurements.md) — Language Service and compiler timings,
   and the memory cost of diagnostics that link into manifests.
+
+## Fluent UI fork validation
+
+Run `node validation/validate-cem.mjs` after installing this app's dependencies with the local Angular CEM compiler and generating `../fluentui/packages/web-components/custom-elements.json`. An optional first argument selects another generated manifest file.
+
+The script uses isolated copies of the installed published package's declarations and metadata. It reproduces the published manifest's strict-template errors, swaps in the fork-generated manifest, verifies public Button references plus the actual TextArea/Option tags, and confirms an invalid Button appearance is rejected. `validation/results.json` records results and versions. This checks consumer metadata and declaration compatibility; it does not claim to test a built fork runtime or browser behavior. Installed dependencies are never modified.
+
+Source fork review: [fluentui PR #1](https://github.com/JSMike/fluentui/pull/1). Local validation branch: `validate/cem-fluentui`.
