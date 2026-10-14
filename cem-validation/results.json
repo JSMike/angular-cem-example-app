@@ -1,0 +1,42 @@
+{
+  "package": "@rhds/elements",
+  "angularRevision": "aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d",
+  "compilerVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "baselineVersion": "4.2.0",
+  "candidateVersion": "4.2.0",
+  "fork": "458f411605e284be13c9774ed69caecd2c847127",
+  "fixture": "Published package with only fork export-map change applied",
+  "results": [
+    {
+      "label": "before-valid",
+      "exitCode": 1,
+      "codes": {
+        "4007": 1
+      }
+    },
+    {
+      "label": "before-invalid",
+      "exitCode": 1,
+      "codes": {
+        "4007": 1
+      }
+    },
+    {
+      "label": "after-valid",
+      "exitCode": 0,
+      "codes": {
+        "4010": 91,
+        "4013": 59
+      }
+    },
+    {
+      "label": "after-invalid",
+      "exitCode": 1,
+      "codes": {
+        "2322": 1,
+        "4010": 91,
+        "4013": 59
+      }
+    }
+  ]
+}

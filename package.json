@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:regression": "node regression/run.mjs"
+    "test:regression": "node regression/run.mjs",
+    "test:cem-fork": "node cem-validation/run.mjs"
   },
   "private": true,
   "packageManager": "npm@10.9.2",
