@@ -1,0 +1,47 @@
+{
+  "package": "@lion/ui",
+  "angularRevision": "aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d",
+  "compilerVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "baselineVersion": "0.18.1",
+  "candidateVersion": "0.23.0",
+  "fork": "e7b2b7ef62de8c4b43117d097c8d2473df8e7dec",
+  "fixture": "Actual fork npm pack with generated CEM and declarations",
+  "results": [
+    {
+      "label": "before-valid",
+      "exitCode": 0,
+      "codes": {
+        "4009": 4,
+        "4010": 1,
+        "4013": 658,
+        "4014": 1
+      }
+    },
+    {
+      "label": "before-invalid",
+      "exitCode": 1,
+      "codes": {
+        "2322": 1,
+        "4009": 4,
+        "4010": 1,
+        "4013": 658,
+        "4014": 1
+      }
+    },
+    {
+      "label": "after-valid",
+      "exitCode": 0,
+      "codes": {
+        "4013": 98
+      }
+    },
+    {
+      "label": "after-invalid",
+      "exitCode": 1,
+      "codes": {
+        "2322": 1,
+        "4013": 98
+      }
+    }
+  ]
+}
