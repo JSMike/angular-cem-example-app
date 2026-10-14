@@ -1,0 +1,58 @@
+{
+  "package": "@aurodesignsystem/auro-button",
+  "baseline": "12.3.2",
+  "angularVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "angularSha": "aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d",
+  "sourceSha": "53d63cc1ed0aebe0f56cd00236e6c25e35a10769",
+  "checks": [
+    {
+      "name": "missing-instance-type",
+      "side": "before",
+      "counts": {
+        "NG4011": 1,
+        "TS2339": 1
+      },
+      "errors": [
+        {
+          "code": "TS2339",
+          "category": "Error",
+          "message": "Property 'disabled' does not exist on type 'HTMLElement'."
+        }
+      ]
+    },
+    {
+      "name": "typed-instance",
+      "side": "after",
+      "counts": {},
+      "errors": []
+    },
+    {
+      "name": "reject-unknown-member",
+      "side": "after",
+      "counts": {
+        "TS2339": 1
+      },
+      "errors": [
+        {
+          "code": "TS2339",
+          "category": "Error",
+          "message": "Property 'notARealMember' does not exist on type 'AuroButton'."
+        }
+      ]
+    },
+    {
+      "name": "reject-wrong-property-type",
+      "side": "after",
+      "counts": {
+        "TS2322": 1
+      },
+      "errors": [
+        {
+          "code": "TS2322",
+          "category": "Error",
+          "message": "Type 'string' is not assignable to type 'boolean'."
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "package": "@aurodesignsystem/auro-button",
+  "baseline": "12.3.2",
+  "source": "../auro-button",
+  "distribution": ".",
+  "probes": [
+    {
+      "side": "before",
+      "name": "missing-instance-type",
+      "template": "<auro-button #button>{{ button.disabled }}</auro-button>",
+      "error": "Property 'disabled'",
+      "warning": "NG4011"
+    },
+    {
+      "side": "after",
+      "name": "typed-instance",
+      "template": "<auro-button #button [disabled]=\"true\">{{ button.disabled }}</auro-button>"
+    },
+    {
+      "side": "after",
+      "name": "reject-unknown-member",
+      "template": "<auro-button #button>{{ button.notARealMember }}</auro-button>",
+      "error": "Property 'notARealMember'"
+    },
+    {
+      "side": "after",
+      "name": "reject-wrong-property-type",
+      "template": "<auro-button [disabled]=\"'wrong'\"></auro-button>",
+      "error": "not assignable"
+    }
+  ]
+}
