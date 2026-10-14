@@ -1,0 +1,33 @@
+{
+  "package": "@cds/core",
+  "baseline": "6.17.0",
+  "source": "../core",
+  "distribution": "projects/core/dist/lib",
+  "temporaryVersion": true,
+  "probes": [
+    {
+      "side": "before",
+      "name": "unquoted-union-accepts-invalid-value",
+      "template": "<cds-button [loadingState]=\"'wrong'\"></cds-button>",
+      "warning": "NG4013"
+    },
+    {
+      "side": "before",
+      "name": "hidden-instance-type",
+      "template": "<cds-button #button>{{ button.disabled }}</cds-button>",
+      "error": "Property 'disabled'",
+      "warning": "NG4011"
+    },
+    {
+      "side": "after",
+      "name": "typed-instance-and-valid-union",
+      "template": "<cds-button #button [loadingState]=\"'loading'\">{{ button.disabled }}</cds-button>"
+    },
+    {
+      "side": "after",
+      "name": "reject-invalid-loading-state",
+      "template": "<cds-button [loadingState]=\"'wrong'\"></cds-button>",
+      "error": "not assignable"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "package": "@cds/core",
+  "baseline": "6.17.0",
+  "angularVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "angularSha": "aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d",
+  "sourceSha": "cda9c926ae6396d7a516fb087ab4dc507ac6d20c",
+  "checks": [
+    {
+      "name": "unquoted-union-accepts-invalid-value",
+      "side": "before",
+      "counts": {
+        "NG4013": 239,
+        "NG4011": 68
+      },
+      "errors": []
+    },
+    {
+      "name": "hidden-instance-type",
+      "side": "before",
+      "counts": {
+        "NG4013": 239,
+        "NG4011": 68,
+        "TS2339": 1
+      },
+      "errors": [
+        {
+          "code": "TS2339",
+          "category": "Error",
+          "message": "Property 'disabled' does not exist on type 'HTMLElement'."
+        }
+      ]
+    },
+    {
+      "name": "typed-instance-and-valid-union",
+      "side": "after",
+      "counts": {
+        "NG4013": 235
+      },
+      "errors": []
+    },
+    {
+      "name": "reject-invalid-loading-state",
+      "side": "after",
+      "counts": {
+        "NG4013": 235,
+        "TS2322": 1
+      },
+      "errors": [
+        {
+          "code": "TS2322",
+          "category": "Error",
+          "message": "Type '\"wrong\"' is not assignable to type '\"default\" | \"loading\" | \"success\" | \"error\"'."
+        }
+      ]
+    }
+  ]
+}
