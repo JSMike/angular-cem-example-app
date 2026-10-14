@@ -669,3 +669,19 @@ Storybook-derived composition examples plus public CSS/Sass utility guidance.
   issues, and runtime and forms concerns that are out of scope.
 - [`ls-perf/measurements.md`](./ls-perf/measurements.md) — Language Service and compiler timings,
   and the memory cost of diagnostics that link into manifests.
+
+## Validate the Spectrum CEM fork
+
+This branch validates [the Spectrum fork PR](https://github.com/JSMike/spectrum-web-components/pull/1) using `../spectrum-web-components` (override with `SPECTRUM_FORK`). After installing this example application's dependencies against the local Angular PR build, run:
+
+```sh
+npm run test:library-cem
+```
+
+The runner downloads the exact published button and textfield `1.12.2` archives into `regression/.tmp/library-cem`, creates independent before/after packages, and invokes the actual fork's `cem-plugin-local-types.js` against their manifests. Exported aliases are discovered from the matching published `.d.ts` files, so runtime code and declarations remain identical in both cases. This is a published-package metadata fixture, not a full Spectrum monorepo build; it avoids mixing unreleased source APIs with released declarations. Install Spectrum's development dependencies before running the check.
+
+The local Angular compiler then checks valid and invalid `variant`, `treatment`, and textfield `type` bindings. Valid values must compile in both fixtures. Invalid values must escape checking before the fix and produce three `TS2322` errors after it. The tests load package-owned manifests directly, without the gallery's local button manifest or `CUSTOM_ELEMENTS_SCHEMA`.
+
+`regression/.tmp/library-cem/results.json` records all compiler diagnostics, exact package versions, Angular version, fork commit, and whether the fork had uncommitted changes. `--prepare` prepares the fixtures without loading Angular. The runner never changes this application's installed packages or another worktree's dependencies. Imported/global Spectrum type-reference gaps and Angular's deliberate inheritance boundary remain outside this focused validation.
+
+Verified on 2026-10-14 with Node 24.21.0, Angular `22.3.0-next.0+sha-aa4fd8f` (source `aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d`), and clean Spectrum fork commit `d56f48951914beab76de2df191a73a968b014073`: valid bindings pass before and after; all three invalid bindings pass before and produce `TS2322` afterward (`ButtonVariants`, `ButtonTreatments`, and the `TextfieldType` union). Missing-type warnings improve from 7 to 3 members for button and 8 to 5 for textfield. Remaining imported/global/controller metadata is outside this local-type-reference fix.
