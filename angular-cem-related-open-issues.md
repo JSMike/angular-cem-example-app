@@ -48,6 +48,125 @@ produces are left out.
    and ask for testing before merge. Comment, without closing, on #12045, #58483, and #36355 so their
    authors and maintainers can review the overlap.
 
+## Library producer follow-ups (2026-10-14)
+
+The library review compared the gallery's published package versions with current upstream source.
+These are producer follow-ups, separate from the Angular issues above. Repairs target review PRs
+in `JSMike` forks; none were submitted to the source repositories.
+
+### Fork review and consumer validation
+
+Each repair has a separate source branch and a separate worktree of this example project at
+`~/dev/angular-cem-validate-<repository>`, on `validate/cem-<repository>`. The validation runners
+compare published metadata with the repaired producer output and exercise strict Angular template
+checking. They use the locally built `../angular` branch for Angular framework/compiler packages;
+Angular CLI/build tooling remains the gallery's configured CLI version. Results are recorded in
+each worktree's validation README/results: `validation/` for Auro, Clarity, UI5, and Fluent;
+`cem-validation/` for Lion, PatternFly, Red Hat, and Shoelace; and the root `README.md` with
+`regression/library-cem.mjs` for Spectrum and Calcite.
+
+| Library    | Source repository                                                                     | Fork review PR                                                                               | Example validation worktree suffix | Repair                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Auro       | [AlaskaAirlines/auro-button](https://github.com/AlaskaAirlines/auro-button)           | [JSMike/auro-button#1](https://github.com/JSMike/auro-button/pull/1)                         | `auro-button`                      | Publish usable class declarations and point CEM at the public class entry point.                       |
+| Clarity    | [vmware-clarity/core](https://github.com/vmware-clarity/core)                         | [JSMike/core#1](https://github.com/JSMike/core/pull/1)                                       | `core`                             | Expose shipped element declaration modules to type resolution; correct loading-state literal metadata. |
+| UI5        | [UI5/webcomponents](https://github.com/UI5/webcomponents)                             | [JSMike/webcomponents#1](https://github.com/JSMike/webcomponents/pull/1)                     | `webcomponents`                    | Add reference spans/global event metadata and remove redundant same-module definition records.         |
+| Fluent     | [microsoft/fluentui](https://github.com/microsoft/fluentui)                           | [JSMike/fluentui#1](https://github.com/JSMike/fluentui/pull/1)                               | `fluentui`                         | Correct public module/type references and element tag metadata.                                        |
+| Spectrum   | [adobe/spectrum-web-components](https://github.com/adobe/spectrum-web-components)     | [JSMike/spectrum-web-components#1](https://github.com/JSMike/spectrum-web-components/pull/1) | `spectrum-web-components`          | Add references for exported local named types.                                                         |
+| Calcite    | [Esri/calcite-design-system](https://github.com/Esri/calcite-design-system)           | [JSMike/calcite-design-system#1](https://github.com/JSMike/calcite-design-system/pull/1)     | `calcite-design-system`            | Expose shipped declaration subpaths referenced by CEM through type-only package exports.               |
+| Lion       | [ing-bank/lion](https://github.com/ing-bank/lion)                                     | [JSMike/lion#1](https://github.com/JSMike/lion/pull/1)                                       | `lion`                             | Exclude test/helper registrations and correct the input-range tag name.                                |
+| PatternFly | [patternfly/patternfly-elements](https://github.com/patternfly/patternfly-elements)   | [JSMike/patternfly-elements#1](https://github.com/JSMike/patternfly-elements/pull/1)         | `patternfly-elements`              | Export the published manifest through the package export map.                                          |
+| Red Hat    | [RedHat-UX/red-hat-design-system](https://github.com/RedHat-UX/red-hat-design-system) | [JSMike/red-hat-design-system#1](https://github.com/JSMike/red-hat-design-system/pull/1)     | `red-hat-design-system`            | Export the published manifest through the package export map.                                          |
+| Shoelace   | [shoelace-style/shoelace](https://github.com/shoelace-style/shoelace)                 | [JSMike/shoelace#1](https://github.com/JSMike/shoelace/pull/1)                               | `shoelace`                         | Add resolvable global/public type and event references without changing wrapper generation.            |
+
+Validation scope is deliberately recorded per worktree. Spectrum uses published declarations plus
+its fork's actual reference-enrichment plugin; Calcite, PatternFly, and Red Hat use isolated copies
+of published packages with their package metadata fixes. These checks do not imply a complete
+monorepo build or browser/accessibility audit. Auro, Clarity, Lion, and Shoelace checks consume built
+fork package artifacts. UI5 and Fluent record their generated-manifest fixture details alongside
+results. Cursor CLI with `grok-4.7-high` reviewed each source fix; accepted findings are described in
+the corresponding fork PR.
+
+The complete Angular build (`pnpm build`) succeeded at commit
+`aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d`, producing
+`22.3.0-next.0+sha-aa4fd8f`. The existing example-app regression suite passed **8/8** scenarios
+against those local packages. Consumer checks demonstrate both successful valid bindings and
+rejection of invalid values; passing a check does not mean every warning in the package is gone.
+
+Run the dedicated consumer checks from the corresponding worktree:
+
+- Auro, Clarity, Spectrum, Calcite: `npm run test:library-cem`.
+- UI5, Fluent: `node validation/validate-cem.mjs`.
+- Lion, PatternFly, Red Hat, Shoelace: `npm run test:cem-fork`.
+
+Validated example-project branch commits (all targeted checks passed):
+
+| Worktree suffix           | Local validation commit |
+| ------------------------- | ----------------------- |
+| `auro-button`             | `f253559`               |
+| `core`                    | `a315847`               |
+| `webcomponents`           | `de27b06`               |
+| `fluentui`                | `0630fd2`               |
+| `spectrum-web-components` | `4659f95`               |
+| `calcite-design-system`   | `1ce9701`               |
+| `lion`                    | `2131e76`               |
+| `patternfly-elements`     | `1b7066e`               |
+| `red-hat-design-system`   | `c3df481`               |
+| `shoelace`                | `a9257d1`               |
+
+### Remaining interoperability questions
+
+- UI5's current generated main manifest references 70 distinct local enum modules through named
+  types that the modules only export as `default`. Fixing reference spans alone does not resolve
+  those exports. Adding public named exports or supporting export aliases requires a separate
+  compatibility decision.
+- The Angular branch currently requires an offset-based reference's selected text to equal
+  `reference.name`. CEM references identify exported names, so renamed imports need further
+  consumer review; emitting a correct export reference alone does not establish Angular support
+  for a differently named local alias.
+- Fluent retains private helper modules and additional type-reference gaps outside its repaired
+  public class/options exports. UI5 also has global-reference gaps beyond Event/CustomEvent.
+- Spectrum's local named-type repairs do not cover every imported or platform type. Shoelace's
+  repair is similarly limited to symbols resolvable through standard libraries or its public
+  exports. Unresolved/private types should not be guessed.
+- Repeated definition records associated with dependency imports and barrel modules need separate
+  producer/consumer interpretation. Do not remove registrations merely to silence `NG4010`, or
+  assume each warning proves a second runtime `customElements.define()` call.
+- Clarity's source repository is archived, and Shoelace's contribution guide states that the
+  project is sunset. Fork review does not imply that an upstream submission can be accepted.
+
+### Material Web: missing manifest already resolved
+
+The gallery depends on `@material/web` 2.4.1 and supplies its own manifest. Published 2.5.0 now
+includes `custom-elements.json`, its `package.json#customElements` field, and generated declarations
+for `md-filled-button`. The current
+[`material-components/material-web`](https://github.com/material-components/material-web) build
+generates the manifest with `@lit-labs/gen-manifest`. The 2.5.0 tarball was inspected to verify that
+the manifest actually ships (330 modules). A fork and local checkout at `~/dev/material-web` were
+prepared for investigation; no redundant missing-manifest patch or PR was created.
+
+### Libraries without a confirmed producer defect in this review
+
+The configured `@box-model/web` package maps to
+[`JSMike/box-model.dev`](https://github.com/JSMike/box-model.dev), and `@vaadin/button` maps to
+[`vaadin/web-components`](https://github.com/vaadin/web-components). No repair was identified for
+their configured declarations. Vaadin mixin traversal remains an Angular scope limitation.
+`@microsoft/fast-element` is a component foundation, `@microsoft/focusgroup-polyfill` is a polyfill,
+and `@nordhealth/css` is a stylesheet package; absence of an element manifest in those dependencies
+does not by itself establish a missing component-library feature.
+
+### Library follow-up: Nord source access
+
+On 2026-10-14, the library manifest review confirmed that `@nordhealth/components` publishes
+references to unshipped `src/*.ts` modules, which prevents consumers from resolving element class
+and event types through the manifest. Nord's package metadata points to
+[`nordhealth/design-system`](https://github.com/nordhealth/design-system), but GitHub returns
+“not found” for the authenticated `JSMike` account, and the repository is absent from Nord's public
+repository listing. It may be private or no longer available at that location.
+
+**Deferred at the user's request:** skip Nord for now. No Nord fork, local source fix, or PR was
+created. Resume when an accessible source repository or checkout is available; the published
+manifest alone is not enough to repair and validate its generation pipeline.
+
 ## Search notes
 
 The review searched open issues for `custom elements`, `web components`,
