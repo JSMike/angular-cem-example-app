@@ -1,0 +1,35 @@
+{
+  "library": "webcomponents",
+  "packageName": "@ui5/webcomponents",
+  "declarationPackageVersion": "2.24.0",
+  "generatedManifest": "/home/mike/dev/webcomponents/packages/main/dist/custom-elements.json",
+  "generatedManifestSha256": "d81859498a68d3e272f36ef21448f07c51f46dae92504f6948d4611c711198ea",
+  "angularCompilerVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "fixtureKind": "published declaration package with fork-generated manifest; not a full fork runtime build",
+  "baselineErrors": [
+    {
+      "code": 2345,
+      "category": "error",
+      "message": "Argument of type 'PointerEvent' is not assignable to parameter of type 'CustomEvent<ButtonClickEventDetail>'.\n  Property 'initCustomEvent' is missing in type 'PointerEvent' but required in type 'CustomEvent<ButtonClickEventDetail>'."
+    }
+  ],
+  "baselineInvalidErrors": [
+    {
+      "code": 2339,
+      "category": "error",
+      "message": "Property 'shiftKey' does not exist on type 'number'."
+    }
+  ],
+  "fixedErrors": [],
+  "invalidErrors": [
+    {
+      "code": 2345,
+      "category": "error",
+      "message": "Argument of type 'boolean' is not assignable to parameter of type 'number'."
+    }
+  ],
+  "warnings": {
+    "baseline": 319,
+    "fixed": 155
+  }
+}

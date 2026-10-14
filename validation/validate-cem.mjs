@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -80,7 +81,8 @@ assert.deepEqual(errors(fixed), [], 'The generated fork manifest must accept the
 assert.ok(errors(invalid).some(diagnostic => [2322, 2345].includes(diagnostic.code)), 'The generated manifest must reject the invalid property/event value');
 const result = {
   library, packageName: config.packageName, declarationPackageVersion: packageJson.version,
-  generatedManifest, angularCompilerVersion: ng.VERSION.full,
+  generatedManifest, generatedManifestSha256: createHash('sha256').update(manifestText).digest('hex'),
+  angularCompilerVersion: ng.VERSION.full,
   fixtureKind: 'published declaration package with fork-generated manifest; not a full fork runtime build',
   baselineErrors: errors(baseline), baselineInvalidErrors: errors(baselineInvalid), fixedErrors: errors(fixed), invalidErrors: errors(invalid),
   warnings: { baseline: baseline.filter(d => d.category === 'warning').length, fixed: fixed.filter(d => d.category === 'warning').length },
