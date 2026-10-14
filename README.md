@@ -669,3 +669,19 @@ Storybook-derived composition examples plus public CSS/Sass utility guidance.
   issues, and runtime and forms concerns that are out of scope.
 - [`ls-perf/measurements.md`](./ls-perf/measurements.md) — Language Service and compiler timings,
   and the memory cost of diagnostics that link into manifests.
+
+## Validate the Calcite CEM fork
+
+This branch validates [the Calcite fork PR](https://github.com/JSMike/calcite-design-system/pull/1) using `../calcite-design-system` (override with `CALCITE_FORK`). After installing this example application's dependencies against the local Angular PR build, run:
+
+```sh
+npm run test:library-cem
+```
+
+The runner downloads the exact published `@esri/calcite-components@5.2.0-next.99` archive into `regression/.tmp/library-cem` and creates independent before/after packages. The only change in the after package is the `exports` map read from the fork's `packages/components/package.json`. All runtime code, declarations, and manifest metadata remain the published files. This is a published-package metadata fixture, not a full Calcite monorepo build.
+
+The local Angular compiler checks valid and invalid `calcite-button` `scale` and `alignment` bindings. Valid values must compile in both fixtures. Invalid values must escape checking before the fix and produce two `TS2322` errors after it, demonstrating that the previously hidden manifest type references now resolve through the package's public exports. The tests use the package-owned manifest without `CUSTOM_ELEMENTS_SCHEMA` or consumer type overrides.
+
+`regression/.tmp/library-cem/results.json` records all diagnostics, package version, Angular version, fork commit, and whether the fork had uncommitted changes. `--prepare` prepares fixtures without loading Angular. The runner never changes this application's installed packages or another worktree's dependencies.
+
+Verified on 2026-10-14 with Node 24.21.0, Angular `22.3.0-next.0+sha-aa4fd8f` (source `aa4fd8f5f82e4f77f8f603a22e4d66497b841f4d`), and clean Calcite fork commit `392df72c971432ed68f70b3c02eab97aa0dba7e8`: valid bindings pass before and after; both invalid bindings pass before and produce `TS2322` afterward (`Scale` and `ButtonAlignment`). The warning about 32 unresolved type references disappears. The separate warning about 21 members with missing or unusable metadata remains outside this export-map fix.
