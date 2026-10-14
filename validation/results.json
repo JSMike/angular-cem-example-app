@@ -1,0 +1,39 @@
+{
+  "library": "fluentui",
+  "packageName": "@fluentui/web-components",
+  "declarationPackageVersion": "3.0.2",
+  "generatedManifest": "/home/mike/dev/fluentui/packages/web-components/custom-elements.json",
+  "generatedManifestSha256": "90f2041a5faa35cb450f165bb232d639ddec51de9146a59dfd86ccabd97a37cb",
+  "angularCompilerVersion": "22.3.0-next.0+sha-aa4fd8f",
+  "fixtureKind": "published declaration package with fork-generated manifest; not a full fork runtime build",
+  "baselineErrors": [
+    {
+      "code": 2345,
+      "category": "error",
+      "message": "Argument of type 'HTMLElement' is not assignable to parameter of type 'Button'.\n  Type 'HTMLElement' is missing the following properties from type 'Button': iconOnly, defaultSlottedContent, disabled, disabledChanged, and 22 more."
+    },
+    {
+      "code": -998001,
+      "category": "error",
+      "message": "'fluent-textarea' is not a known element:\n1. If 'fluent-textarea' is an Angular component, then verify that it is included in the '@Component.imports' of this component.\n2. If 'fluent-textarea' is a Web Component then check that a Custom Elements Manifest in 'angularCompilerOptions.customElementsManifests' declares it, or add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001"
+    },
+    {
+      "code": -998001,
+      "category": "error",
+      "message": "'fluent-option' is not a known element:\n1. If 'fluent-option' is an Angular component, then verify that it is included in the '@Component.imports' of this component.\n2. If 'fluent-option' is a Web Component then check that a Custom Elements Manifest in 'angularCompilerOptions.customElementsManifests' declares it, or add 'CUSTOM_ELEMENTS_SCHEMA' to the '@Component.schemas' of this component to suppress this message. Find more at https://next.angular.dev/errors/NG8001"
+    }
+  ],
+  "baselineInvalidErrors": [],
+  "fixedErrors": [],
+  "invalidErrors": [
+    {
+      "code": 2322,
+      "category": "error",
+      "message": "Type '\"not-a-button-appearance\"' is not assignable to type 'ButtonAppearance | undefined'."
+    }
+  ],
+  "warnings": {
+    "baseline": 332,
+    "fixed": 82
+  }
+}
