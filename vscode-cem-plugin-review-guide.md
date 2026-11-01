@@ -49,7 +49,7 @@ application does not update editor behavior.
 
    ```bash
    cd ../angular
-   pnpm --filter=ng-template run package
+   pnpm bazel build --jobs=1 --config=release //vscode-ng-language-service:development_package
    ```
 
 2. Return to this repository and install the VSIX into the WSL extension host:
@@ -87,9 +87,9 @@ npm test -- --watch=false
 
 Expected result:
 
-- the installed compiler is the locally built Angular 22.1 development package;
+- the installed compiler is the locally built Angular 22.2 development package;
 - `ngc` exits successfully with zero template errors;
-- the current third-party compatibility matrix emits 25 bounded summary warnings; and
+- the current third-party compatibility matrix emits 28 bounded summary warnings; and
 - all eight application tests pass.
 
 The third-party warnings are fixtures, not a failed setup. Their compatibility boundaries are
@@ -99,7 +99,7 @@ summarized in the
 Confirm that blanket schema suppression is absent:
 
 ```bash
-rg 'CUSTOM_ELEMENTS_SCHEMA|NO_ERRORS_SCHEMA' src
+rg 'CUSTOM_ELEMENTS_SCHEMA|NO_ERRORS_SCHEMA' src -g '*.ts'
 ```
 
 Expected result: no matches. The configured manifests are in
@@ -328,6 +328,10 @@ Optional before/after comparison:
    type lacks the references Angular needs for trusted value checking and finite completions. The
    corresponding NG4013 warning explains the narrow fallback.
 
+   The vendor button manifest also omits `disabled`. Its existing binding produces NG8002.
+   Temporarily remove that binding to isolate the `variant` check, then restore it with the
+   local manifest entry.
+
 4. Restore the local manifest entry and restart the language server.
 
 This demonstrates that the consumer override replaces unusable metadata; Angular does not silently
@@ -491,11 +495,23 @@ Run:
 ./node_modules/.bin/ngc -p tsconfig.app.json --noEmit
 ```
 
-Expected result: the same successful compilation expands the 25 bounded summary warnings into
-1,802 individual findings (19 NG4009 + 330 NG4011 + 1,153 NG4013 + 300 NG4014). Restore the
+Expected result: the same successful compilation expands the 28 bounded summary warnings into
+1,936 individual findings. These are 19 NG4009, 134 NG4010, 330 NG4011, 1,153 NG4013, and 300 NG4014. Restore the
 default by removing the option.
 
 ## 16. Run the automated editor-protocol smoke test
+
+Run the compiler variants and 44 editor checks with:
+
+```bash
+npm run test:cem
+```
+
+These checks use in-memory compiler inputs and unsaved language-server document buffers.
+They cover completion edits, directive-owned inputs, property/event name collisions, diagnostics,
+hovers, and local-reference types. They do not replace the saved-file watcher check in section 14.
+Unsaved manifest buffers affect subsequent requests, but currently do not trigger template
+diagnostic notifications on their own.
 
 The repository includes a protocol-level harness that launches the freshly built language server
 from `../angular`, measures completion latency, and asserts the two consumer-owned completion sets:

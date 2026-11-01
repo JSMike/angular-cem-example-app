@@ -1,24 +1,23 @@
 /**
  * LSP measurement harness for the Angular language server built from `../angular`.
  *
- * Drives the built ngserver over stdio against this demo app and times
- * `textDocument/completion` cold, warm, and after TypeScript/HTML edits. Used for the
- * oversized-manifest hash-cadence follow-up (2nd-pass-plan.md item 1.2): run once with the
- * committed tsconfig (focused 4 KB Lion projection) and once with the full 5.6 MB
- * `@lion/ui` manifest configured, and compare per-edit latency.
+ * Measures completion latency before and after TypeScript and HTML edits.
+ * Compare the configured Lion projection with the full published manifest.
  *
  * Usage:
  *   node ls-perf/harness.js [--edits N]
  *
- * IMPORTANT: `--ngProbeLocations` must point at the freshly built LS sandbox
- * (`dist/bin/vscode-ng-language-service/vsix_sandbox/node_modules`); the copy in this app's
- * node_modules is stale until a dist reinstall.
+ * `--ngProbeLocations` points at the built VSIX sandbox. Reinstalling the app's
+ * dependencies does not rebuild this language server.
  */
 'use strict';
 
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const { EventEmitter } = require('events');
+
+const notifications = new EventEmitter();
 
 const appRoot = path.resolve(__dirname, '..');
 const sandbox = path.resolve(
@@ -87,8 +86,19 @@ function send(message) {
 
 function request(method, params) {
   const id = nextId++;
-  return new Promise((resolve) => {
-    pending.set(id, resolve);
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      pending.delete(id);
+      reject(new Error(`Timed out waiting for ${method}`));
+    }, 30000);
+    pending.set(id, (message) => {
+      clearTimeout(timeout);
+      if (message.error) {
+        reject(new Error(JSON.stringify(message.error)));
+      } else {
+        resolve(message);
+      }
+    });
     send({ jsonrpc: '2.0', id, method, params });
   });
 }
@@ -107,11 +117,12 @@ function onMessage(message) {
     return;
   }
   if (message.id !== undefined) {
-    // Server-initiated request (workspace/configuration, client/registerCapability, …):
-    // a null result satisfies the server for measurement purposes.
+    // These tests do not provide client configuration or file watchers.
     send({ jsonrpc: '2.0', id: message.id, result: null });
   }
-  // Notifications (diagnostics, progress) are ignored.
+  if (message.method !== undefined) {
+    notifications.emit(message.method, message.params);
+  }
 }
 
 function positionOf(text, needle, offsetInNeedle) {
@@ -229,8 +240,12 @@ async function main() {
   process.exit(0);
 }
 
-main().catch((error) => {
-  console.error(error);
-  child.kill();
-  process.exit(1);
-});
+module.exports = { appRoot, child, notifications, notify, request, uriOf, positionOf };
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    child.kill();
+    process.exit(1);
+  });
+}

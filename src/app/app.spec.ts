@@ -12,9 +12,9 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('should create the app shell with integration navigation', () => {
+  it('should create the app shell with integration navigation', async () => {
     const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(fixture.componentInstance).toBeTruthy();
@@ -25,10 +25,9 @@ describe('App', () => {
 
   it('should lazy-load the Box Model UI integration page', async () => {
     const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     await TestBed.inject(Router).navigateByUrl('/box-model');
-    fixture.detectChanges();
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;

@@ -81,6 +81,11 @@ sl-rating {
   margin-bottom: 1rem;
 }
 
+sl-button[variant='success'] {
+  // The default outline color is below AA contrast against the light article background.
+  --sl-color-success-600: var(--sl-color-success-700);
+}
+
 code {
   padding: 0.1em 0.35em;
   border-radius: 0.25rem;
@@ -94,6 +99,6 @@ code {
 
   .form-grid,
   .status-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

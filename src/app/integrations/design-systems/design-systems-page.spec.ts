@@ -30,9 +30,9 @@ describe('DesignSystemsPage', () => {
     }).compileComponents();
   });
 
-  it('renders each manifest-backed design system', () => {
+  it('renders each manifest-backed design system', async () => {
     const fixture = TestBed.createComponent(DesignSystemsPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const tags = [
@@ -57,13 +57,13 @@ describe('DesignSystemsPage', () => {
     }
   });
 
-  it('binds the shared state signal to every component button', () => {
+  it('binds the shared state signal to every component button', async () => {
     const fixture = TestBed.createComponent(DesignSystemsPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const toggle = fixture.nativeElement.querySelector('.toolbar button') as HTMLButtonElement;
     toggle.click();
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const spectrumButton = fixture.nativeElement.querySelector('sp-button') as HTMLElement & {
       disabled?: boolean;

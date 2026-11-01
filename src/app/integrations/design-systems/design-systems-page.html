@@ -8,7 +8,7 @@
       <code>CUSTOM_ELEMENTS_SCHEMA</code>.
     </p>
 
-    <div class="toolbar" aria-label="Integration controls">
+    <div class="toolbar" role="group" aria-label="Integration controls">
       <button type="button" [attr.aria-pressed]="controlsDisabled()" (click)="toggleDisabled()">
         Toggle component state: {{ controlsDisabled() ? 'on' : 'off' }}
       </button>
@@ -62,7 +62,8 @@
         <span class="status status--partial">Partial types</span>
       </div>
       <p>
-        Static enum values and default-exported property types are checked. The manifest's
+        Static enum values are checked. The property type names an export its module does not
+        provide, so the bound enum uses existence-only checking. The manifest's
         <code>click</code> payload type is not applied because its reference omits the
         <code>start</code>/<code>end</code> indices the spec requires for nested names, so
         <code>$event</code> stays native until UI5 emits exact offsets.
@@ -80,7 +81,7 @@
           [disabled]="controlsDisabled()"
           (click)="recordUi5Activation($event)"
         >
-          Default-exported enum binding
+          Enum binding with type fallback
         </ui5-button>
       </div>
     </article>

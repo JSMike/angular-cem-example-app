@@ -9,9 +9,9 @@ describe('BoxModelPage', () => {
     }).compileComponents();
   });
 
-  it('should render referenced and inline manifest-backed properties', () => {
+  it('should render referenced and inline manifest-backed properties', async () => {
     const fixture = TestBed.createComponent(BoxModelPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const button = compiled.querySelector('button-box') as HTMLElement & {
@@ -35,23 +35,23 @@ describe('BoxModelPage', () => {
     expect(progress.label).toBe('Reference resolution: 62%');
   });
 
-  it('should update a referenced union property through an Angular signal binding', () => {
+  it('should update a referenced union property through an Angular signal binding', async () => {
     const fixture = TestBed.createComponent(BoxModelPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const buttonBox = compiled.querySelector('button-box') as HTMLElement & { variant?: string };
     const trigger = buttonBox.querySelector('button') as HTMLButtonElement;
 
     trigger.click();
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(buttonBox.variant).toBe('secondary');
   });
 
-  it('should demonstrate loading the package-owned Intent skill', () => {
+  it('should demonstrate loading the package-owned Intent skill', async () => {
     const fixture = TestBed.createComponent(BoxModelPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const intentSection = compiled.querySelector('[aria-labelledby="intent-heading"]');
@@ -60,15 +60,15 @@ describe('BoxModelPage', () => {
     expect(intentSection?.textContent).toContain('Loaded 34 component examples');
   });
 
-  it('should consume the manifest-typed close event', () => {
+  it('should consume the manifest-typed close event', async () => {
     const fixture = TestBed.createComponent(BoxModelPage);
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
     const alert = compiled.querySelector('alert-box');
 
     alert?.dispatchEvent(new CustomEvent<void>('close'));
-    fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(compiled.querySelector('alert-box')).toBeNull();
   });

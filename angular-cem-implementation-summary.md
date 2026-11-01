@@ -1,6 +1,9 @@
 # Angular Custom Elements Manifest implementation summary
 
-Updated: 2026-07-26
+Updated: 2026-09-04
+
+Current verification uses Angular `6a7c826f34` with the staged cleanup changes. See
+[verification results](./verification-results.md) for the package version and test results.
 
 This document records the completed initial-PR work for Angular's
 `angularCompilerOptions.customElementsManifests` feature. The Angular implementation is in
@@ -159,20 +162,17 @@ UI5 validates static `design="Emphasized"` through its separate string-literal a
 Its property reference names `ButtonDesign`, but the referenced module exports only `default`, so
 exact-reference validation emits `NG4011` rather than guessing a different export. Its `click`
 event declares `CustomEvent<ButtonClickEventDetail>` with an index-less reference nested in
-compound text, which is nonconforming — Angular's earlier unique-occurrence compatibility rule was
-removed by decision on 2026-07-17, so these references (103 events, 36 fields) fail closed with
-`NG4013` and `$event` stays native until UI5 emits exact offsets and explicit global references.
+compound text. These references require exact offsets. The 103 affected events and 36 fields
+produce `NG4013`, and `$event` stays native until UI5 supplies those offsets and global references.
 
-With the current seventeen-manifest gallery, verbose mode reports 1,802 individually itemized CEM
-problems: 19 NG4009, 330 NG4011, 1,153 NG4013, and 300 NG4014. Default mode folds them
-into 25 per-manifest/per-kind summaries, with zero errors and a successful production build.
-Definition records that repeat the same declaration/tag identity are deduplicated before duplicate
-registration diagnostics; conflicting registrations still use deterministic first-wins handling.
-References
+With the current seventeen-manifest gallery, verbose mode reports 1,936 CEM problems.
+These are 19 NG4009, 134 NG4010, 330 NG4011, 1,153 NG4013, and 300 NG4014. Default mode
+groups them into 28 warnings, with zero errors and a successful production build.
+Repeated definition registrations produce NG4010, including repeated declaration/tag identities.
+The first registration wins. References
 whose modules are hidden by package `exports` maps deliberately stay existence-only even when
-declaration files physically ship in the package (a standards-first decision, 2026-07-17: a
-working fallback prototype was reverted in favor of requiring affected libraries to expose the
-declarations their manifests reference). The gallery
+declaration files physically ship in the package. Libraries must export the declarations their
+manifests reference. The gallery
 covers twelve published design systems, the local `@box-model/web` package, focused hand-written
 Lion, Material Web, and Spectrum button manifests, and the in-repo
 `@local/cem-workspace-example` package. Material Web demonstrates adding local metadata for a
@@ -189,13 +189,13 @@ The full 5,797,856-byte Lion manifest also compiles without the previous languag
 assertion. A cold `ngc` comparison measured 2.09 seconds and 570,080 KB peak RSS with the full
 manifest versus 2.12 seconds and 548,712 KB with the focused projection. The elapsed-time difference
 is noise at this sample size; the roughly 21 MB memory increase is directionally useful. The full
-manifest adds its expected three `NG4009` and one `NG4010` producer warnings, so the focused
+manifest now produces 32 summary warnings across the gallery, with zero errors. The focused
 `lion-button` projection remains the normal demo configuration.
 
 The integration results above describe the observable consumer impact. Detailed upstream
 contribution planning is intentionally outside the scope of this public repository.
 
-## Verification completed
+## July 2026 verification
 
 The final run used locally built Angular packages installed in this application. The installed
 compiler version was `22.1.0-next.5+sha-d997a96-with-local-changes`.
@@ -219,7 +219,7 @@ The language-service performance harness measured a 4.15-second cold start, appr
 
 Prettier and `git diff --check` also passed in both repositories.
 
-## Manual editor checkpoint completed
+## July 2026 manual editor checkpoint
 
 The automated language-service coverage, performance smoke test, and packaged VSIX are green. The
 Windows/WSL editor smoke test was also completed successfully with the locally packaged extension.
@@ -250,9 +250,8 @@ The built artifact is `../angular/dist/bin/vscode-ng-language-service/ng-templat
 Call out these details explicitly in the commit message or PR description:
 
 - configuring a manifest can surface errors that `CUSTOM_ELEMENTS_SCHEMA` previously suppressed;
-- index-less `type.references` are honored only in the specification's whole-text form; nested
-  occurrences require exact `start`/`end` indices (a unique-occurrence compatibility extension
-  was removed by decision — producer conformance fixes belong upstream);
+- index-less `type.references` are honored only in the specification's whole-text form;
+  nested occurrences require exact `start`/`end` indices;
 - JavaScript export records in modules without the CEM-required string `path` are skipped rather
   than recovered by declaration name alone;
 - ambiguous export aliases fail closed to existence-only checking;

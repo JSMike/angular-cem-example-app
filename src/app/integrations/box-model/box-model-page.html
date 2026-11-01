@@ -8,10 +8,10 @@
       and a version-matched Agent Skill.
     </p>
     <div class="tag-list" role="list" aria-label="Integration characteristics">
-      <tag-box role="listitem" variant="info">Published package 0.0.1</tag-box>
-      <tag-box role="listitem" variant="success">References resolved</tag-box>
-      <tag-box role="listitem" variant="success">Intent skill loaded</tag-box>
-      <tag-box role="listitem" variant="neutral">No schema suppression</tag-box>
+      <tag-box role="listitem" variant="info"><span>Published package 0.0.1</span></tag-box>
+      <tag-box role="listitem" variant="success"><span>References resolved</span></tag-box>
+      <tag-box role="listitem" variant="success"><span>Intent skill loaded</span></tag-box>
+      <tag-box role="listitem" variant="neutral"><span>No schema suppression</span></tag-box>
     </div>
   </header>
 
@@ -39,7 +39,7 @@
       </p>
     </div>
 
-    <columns-box class="reference-grid" [gap]="columnGap()" [minWidth]="'17rem'">
+    <columns-box class="reference-grid" [gap]="columnGap()" [minWidth]="'min(17rem, 100%)'">
       <card-box class="reference-card">
         <h3 slot="header">Bound ButtonVariant</h3>
         <p>
@@ -97,7 +97,7 @@
           This application explicitly trusts <code>@box-model/web</code> as a source of agent
           guidance.
         </p>
-        <pre><code>&#123;
+        <pre tabindex="0"><code>&#123;
   "intent": &#123;
     "skills": ["&#64;box-model/web"]
   &#125;

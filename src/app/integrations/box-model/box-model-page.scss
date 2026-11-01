@@ -96,6 +96,15 @@ section {
   --card-shadow: var(--box-model-shadow-offset-xs);
 }
 
+.reference-card [slot='actions'] {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.reference-card button {
+  max-width: 100%;
+}
+
 code {
   padding: 0.1em 0.3em;
   background: var(--box-model-background-sunken);
@@ -153,6 +162,6 @@ terminal-box {
   .section-heading,
   .progress-demo,
   .intent-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }

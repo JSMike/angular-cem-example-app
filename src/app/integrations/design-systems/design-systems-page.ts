@@ -21,9 +21,14 @@ import '@local/cem-workspace-example';
 import '@material/web/button/filled-button.js';
 
 import { RhIcon } from '@rhds/elements/rh-icon/rh-icon.js';
+import { webLightTheme } from '@fluentui/tokens';
+import { setTheme } from '@fluentui/web-components/theme/set-theme.js';
 import type { ButtonClickEventDetail } from '@ui5/webcomponents/dist/Button.js';
 import ButtonDesign from '@ui5/webcomponents/dist/types/ButtonDesign.js';
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+
+// Fluent's component styles require theme tokens for color, spacing, and focus indicators.
+setTheme(webLightTheme);
 
 const rhdsIcons = new Map([['microns/checkmark', rhdsCheckmarkIcon]]);
 

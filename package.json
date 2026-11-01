@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:cem": "node ls-perf/compiler-checks.mjs && node ls-perf/i18n-check.mjs && node ls-perf/usage-tests.js",
+    "test:ls-perf": "node ls-perf/harness.js --edits 3"
   },
   "private": true,
   "packageManager": "npm@10.9.2",
@@ -26,6 +28,7 @@
     "@box-model/web": "0.0.1",
     "@cds/core": "^6.17.0",
     "@esri/calcite-components": "^5.1.2",
+    "@fluentui/tokens": "1.0.0-alpha.23",
     "@fluentui/web-components": "^3.0.2",
     "@lion/ui": "^0.18.1",
     "@local/cem-workspace-example": "file:./packages/cem-workspace-example",

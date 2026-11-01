@@ -104,6 +104,14 @@ pnpm install --frozen-lockfile
 pnpm build
 ```
 
+On WSL2, add these settings to the Angular checkout's `.bazelrc.user` before building.
+Keep any existing settings in that file.
+
+```text
+build --jobs=1
+test --local_test_jobs=1
+```
+
 The build must create package-shaped output under `../angular/dist/packages-dist`, including
 `compiler`, `compiler-cli`, `core`, and `language-service`.
 
@@ -445,12 +453,23 @@ Run compiler, production-build, and unit-test checks:
 ./node_modules/.bin/ngc -p tsconfig.app.json --noEmit
 npm run build
 npm test -- --watch=false
+npm run test:cem
+npm run test:ls-perf
 ```
 
-The current verified compiler baseline is 25 summarized CEM warnings and zero errors. These
+The current verified compiler baseline is 28 summarized CEM warnings and zero errors. These
 warnings intentionally demonstrate real producer compatibility issues. Verbose mode expands them
 into individual findings. The observed boundaries are summarized in the
 [implementation summary](./angular-cem-implementation-summary.md#real-package-results).
+
+`test:cem` checks compiler configuration variants, AOT translated property assignments, and editor
+behavior through the locally built language server. It verifies that manifest diagnostics appear
+on the project config and clear after unsaved fixes. Temporary source edits stay in memory; the
+i18n check uses the locally built `@angular/localize` package and removes its generated module.
+Build the server first with
+`pnpm bazel build --jobs=1 --config=release //vscode-ng-language-service:development_package`
+from the Angular checkout. See [current verification results](./verification-results.md) for the
+tested revision, browser checks, and remaining editor limitation.
 
 ## Optionally test the Angular CLI follow-up
 
